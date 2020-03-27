@@ -335,7 +335,8 @@ typedef struct {
 #define ALERT_ONLINE    2
 
     // Bytes 40-99
-    uint8_t _unused40[60];              // 0
+    uint8_t callsign[8];              // 0
+    uint8_t _unused40[52];              // 0
 
 } contact_t;
 
@@ -1364,7 +1365,7 @@ static void d868uv_print_config(radio_device_t *radio, FILE *out, int verbose)
             fprintf(out, "# 5) Incoming call alert: -, +, Online\n");
             fprintf(out, "#\n");
         }
-        fprintf(out, "Contact Name             Type    ID       RxTone\n");
+        fprintf(out, "Contact Name             Type    ID       RxTone   Callsign\n");
         for (i=0; i<NCONTACTS; i++) {
             contact_t *ct = get_contact(i);
 
@@ -1375,8 +1376,11 @@ static void d868uv_print_config(radio_device_t *radio, FILE *out, int verbose)
 
             fprintf(out, "%5d   ", i+1);
             print_ascii(out, ct->name, 16, 1);
-            fprintf(out, " %-7s %-8d %s\n", CONTACT_TYPE[ct->type & 3],
+            fprintf(out, " %-7s %-8d %-8s ", CONTACT_TYPE[ct->type & 3],
                 CONTACT_ID(ct), ALERT_TYPE[ct->call_alert & 3]);
+
+            print_ascii(out, ct->callsign, 8, 1);
+            fprintf(out, "\n");
         }
     }
 
@@ -2368,12 +2372,13 @@ static void erase_contacts()
     memset(GET_CONTACT_MAP(), 0xff, (NCONTACTS + 7) / 8);
 }
 
-static void setup_contact(int index, const char *name, int type, int id, int rxalert)
+static void setup_contact(int index, const char *name, int type, int id, int rxalert, const char* callsign)
 {
     // Fill contact record.
     contact_t *ct = GET_CONTACT(index);
     memset(ct, 0, 100);
     ascii_decode(ct->name, name, 16, 0);
+    ascii_decode(ct->callsign, callsign, 8, 0);
 
     ct->id[0] = ((id / 10000000) << 4) | ((id / 1000000) % 10);
     ct->id[1] = ((id / 100000 % 10) << 4) | ((id / 10000) % 10);
@@ -2417,11 +2422,11 @@ static void setup_contact(int index, const char *name, int type, int id, int rxa
 //
 static int parse_contact(int first_row, char *line)
 {
-    char num_str[256], name_str[256], type_str[256], id_str[256], rxalert_str[256];
+    char num_str[256], name_str[256], type_str[256], id_str[256], rxalert_str[256], callsign_str[256];
     int cnum, type, id, rxalert;
 
-    if (sscanf(line, "%s %s %s %s %s",
-        num_str, name_str, type_str, id_str, rxalert_str) != 5)
+    if (sscanf(line, "%s %s %s %s %s %s",
+        num_str, name_str, type_str, id_str, rxalert_str, callsign_str) != 6)
         return 0;
 
     cnum = atoi(num_str);
@@ -2463,7 +2468,7 @@ static int parse_contact(int first_row, char *line)
         return 0;
     }
 
-    setup_contact(cnum-1, name_str, type, id, rxalert);
+    setup_contact(cnum-1, name_str, type, id, rxalert, callsign_str);
     return 1;
 }
 
