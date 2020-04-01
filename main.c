@@ -162,7 +162,7 @@ int main(int argc, char **argv)
 
         //////////////////////////////////
 //        radio_connect();
-//        radio_read_image("./txalert/device.img.txpermitoff");
+//        radio_read_image("./device.img.name");
 //        radio_print_version(stdout);
         //////////////////////////////////
 
