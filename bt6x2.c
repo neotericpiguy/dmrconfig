@@ -1,5 +1,5 @@
 /*
- * Interface to Anytone D868UV.
+ * Interface to BTECH 6X2.
  *
  * Copyright (C) 2018 Serge Vakulenko, KK6ABQ
  *
@@ -104,7 +104,7 @@
 #define MEMSZ           1606528
 
 //
-// D868UV radio has a huge internal address space, more than 64 Mbytes.
+// 6X2 radio has a huge internal address space, more than 64 Mbytes.
 // The configuration data are dispersed over this space.
 // Here is a table of fragments: starting address and length.
 // We read these fragments and save them into a file continuously.
@@ -116,7 +116,7 @@ typedef struct {
 } fragment_t;
 
 static fragment_t region_map[] = {
-#include "d868uv-map.h"
+#include "bt6x2-map.h"
 };
 
 //
@@ -268,8 +268,12 @@ typedef struct {
 
     uint8_t  _unused7;
 
+    // 30-7
+#define TALK_ALERT_OFFSET 41
     // Bytes 8-0x5ff.
-    uint8_t  _unused8[0x5f8];
+    uint8_t  _unused23[TALK_ALERT_OFFSET];
+    uint8_t  _talk_alert;
+    uint8_t  _unused8[0x5f8-TALK_ALERT_OFFSET-1];
 
     // Bytes 0x600-0x61f
     uint8_t intro_line1[16];    // Up to 14 characters
@@ -442,7 +446,7 @@ static const int CTCSS_TONES[NCTCSS] = {
 //
 // Print a generic information about the device.
 //
-static void d868uv_print_version(radio_device_t *radio, FILE *out)
+static void bt6x2_print_version(radio_device_t *radio, FILE *out)
 {
     // Empty.
 }
@@ -536,7 +540,7 @@ static int skip_region(unsigned addr, unsigned file_offset, uint8_t *mem, unsign
 //
 // Read memory image from the device.
 //
-static void d868uv_download(radio_device_t *radio)
+static void bt6x2_download(radio_device_t *radio)
 {
     fragment_t *f;
 
@@ -577,8 +581,8 @@ static void d868uv_download(radio_device_t *radio)
         }
     }
     if (file_offset != MEMSZ) {
-        fprintf(stderr, "\nWrong MEMSZ=%u for D868UV!\n", MEMSZ);
-        fprintf(stderr, "Should be %u; check d868uv-map.h!\n", file_offset);
+        fprintf(stderr, "\nWrong MEMSZ=%u for 6X2!\n", MEMSZ);
+        fprintf(stderr, "Should be %u; check bt6x2-map.h!\n", file_offset);
         exit(-1);
     }
 }
@@ -599,7 +603,7 @@ static contact_t *get_contact(int i)
 //
 // Write memory image to the device.
 //
-static void d868uv_upload(radio_device_t *radio, int cont_flag)
+static void bt6x2_upload(radio_device_t *radio, int cont_flag)
 {
     fragment_t *f;
     unsigned file_offset = 0;
@@ -629,8 +633,8 @@ static void d868uv_upload(radio_device_t *radio, int cont_flag)
         }
     }
     if (file_offset != MEMSZ) {
-        fprintf(stderr, "\nWrong MEMSZ=%u for D868UV!\n", MEMSZ);
-        fprintf(stderr, "Should be %u; check d868uv-map.h!\n", file_offset);
+        fprintf(stderr, "\nWrong MEMSZ=%u for 6X2!\n", MEMSZ);
+        fprintf(stderr, "Should be %u; check bt6x2-map.h!\n", file_offset);
         exit(-1);
     }
 
@@ -686,7 +690,7 @@ static void d868uv_upload(radio_device_t *radio, int cont_flag)
 //
 // Check whether the memory image is compatible with this device.
 //
-static int d868uv_is_compatible(radio_device_t *radio)
+static int bt6x2_is_compatible(radio_device_t *radio)
 {
     if (memcmp("D868UVE", (char*)&radio_mem[0], 7) == 0)
         return 1;
@@ -716,6 +720,9 @@ static void print_intro(FILE *out, int verbose)
     } else {
         fprintf(out, "-");
     }
+    fprintf(out, "\n\n# General Settings");
+    fprintf(out, "\n# Talk Alert 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
+    fprintf(out, "\nTalk Alert: %d",gs->_talk_alert);
     fprintf(out, "\n");
 }
 
@@ -890,7 +897,7 @@ static void print_chan_base(FILE *out, radio_device_t *radio, channel_t *ch, int
     else
         fprintf(out, "%-4d ", scanlist_index + 1);
 
-    // Transmit timeout timer on D868UV is configured globally,
+    // Transmit timeout timer on 6X2 is configured globally,
     // not per channel. So we don't print it here.
     fprintf(out, "-   ");
 
@@ -1231,13 +1238,13 @@ static int have_messages()
 //
 // Print full information about the device configuration.
 //
-static void d868uv_print_config(radio_device_t *radio, FILE *out, int verbose)
+static void bt6x2_print_config(radio_device_t *radio, FILE *out, int verbose)
 {
     int i;
 
     fprintf(out, "Radio: %s\n", radio->name);
     if (verbose)
-        d868uv_print_version(radio, out);
+        bt6x2_print_version(radio, out);
 
     //
     // Channels.
@@ -1473,7 +1480,7 @@ static void d868uv_print_config(radio_device_t *radio, FILE *out, int verbose)
 //
 // Read memory image from the binary file.
 //
-static void d868uv_read_image(radio_device_t *radio, FILE *img)
+static void bt6x2_read_image(radio_device_t *radio, FILE *img)
 {
     struct stat st;
 
@@ -1499,7 +1506,7 @@ static void d868uv_read_image(radio_device_t *radio, FILE *img)
 //
 // Save memory image to the binary file.
 //
-static void d868uv_save_image(radio_device_t *radio, FILE *img)
+static void bt6x2_save_image(radio_device_t *radio, FILE *img)
 {
     fwrite(&radio_mem[0], 1, MEMSZ, img);
 }
@@ -1507,7 +1514,7 @@ static void d868uv_save_image(radio_device_t *radio, FILE *img)
 //
 // Parse the scalar parameter.
 //
-static void d868uv_parse_parameter(radio_device_t *radio, char *param, char *value)
+static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *value)
 {
     if (strcasecmp("Radio", param) == 0) {
         if (!radio_is_compatible(value)) {
@@ -1528,7 +1535,11 @@ static void d868uv_parse_parameter(radio_device_t *radio, char *param, char *val
         gs->power_on = PWON_CUST_CHAR;
         return;
     }
-    fprintf(stderr, "868 Unknown parameter: %s = %s\n", param, value);
+    if (strcasecmp ("Talk Alert", param) == 0) {
+        gs->_talk_alert = strtoul(value, 0, 0);
+        return;
+    }
+    fprintf(stderr, "Bt Unknown parameter: %s = %s\n", param, value);
     exit(-1);
 }
 
@@ -1691,7 +1702,6 @@ static int parse_digital_channel(radio_device_t *radio, int first_row, char *lin
     int enc_type, enc_key;
     int colorcode, timeslot, grouplist, radioid, contact;
     double rx_mhz, tx_mhz;
-    printf("a1398192837192837\n");
 
     if (sscanf(line, "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
         num_str, name_str, rxfreq_str, offset_str,
@@ -1791,7 +1801,7 @@ badtx:  fprintf(stderr, "Bad transmit frequency.\n");
 
     timeslot = atoi(slot_str);
     if (timeslot < 1 || timeslot > 2) {
-        fprintf(stderr, "Bad timeslot.\n");
+        fprintf(stderr, "Bad timeslot. %d\n",timeslot);
         return 0;
     }
 
@@ -2620,7 +2630,7 @@ static int parse_messages(int first_row, char *line)
 // Parse table header.
 // Return table id, or 0 in case of error.
 //
-static int d868uv_parse_header(radio_device_t *radio, char *line)
+static int bt6x2_parse_header(radio_device_t *radio, char *line)
 {
     if (strncasecmp(line, "Digital", 7) == 0)
         return 'D';
@@ -2645,7 +2655,7 @@ static int d868uv_parse_header(radio_device_t *radio, char *line)
 // Parse one line of table data.
 // Return 0 on failure.
 //
-static int d868uv_parse_row(radio_device_t *radio, int table_id, int first_row, char *line)
+static int bt6x2_parse_row(radio_device_t *radio, int table_id, int first_row, char *line)
 {
     switch (table_id) {
     case 'D': return parse_digital_channel(radio, first_row, line);
@@ -2663,7 +2673,7 @@ static int d868uv_parse_row(radio_device_t *radio, int table_id, int first_row, 
 //
 // Update timestamp.
 //
-static void d868uv_update_timestamp(radio_device_t *radio)
+static void bt6x2_update_timestamp(radio_device_t *radio)
 {
     // No timestamp.
 }
@@ -2672,7 +2682,7 @@ static void d868uv_update_timestamp(radio_device_t *radio)
 // Check that configuration is correct.
 // Return 0 on error.
 //
-static int d868uv_verify_config(radio_device_t *radio)
+static int bt6x2_verify_config(radio_device_t *radio)
 {
     int i, k, nchannels = 0, nzones = 0, nscanlists = 0, ngrouplists = 0;
     int ncontacts = 0, nerrors = 0;
@@ -2920,7 +2930,7 @@ static int compare_callsign_map(const void *ap, const void *bp)
 //     The data are stored in 100000-byte chunks with 256kbyte step:
 //      04500000-0451869f, 04540000-0455869f, ... 05340000-0535869f and so on.
 //
-static void d868uv_write_csv(radio_device_t *radio, FILE *csv)
+static void bt6x2_write_csv(radio_device_t *radio, FILE *csv)
 {
     callsign_map_t map[NCALLSIGNS];
     callsign_sizes_t sz = {0};
@@ -3093,62 +3103,23 @@ static void d868uv_write_csv(radio_device_t *radio, FILE *csv)
     free(data);
 }
 
-//
-// Anytone AT-D868UV
-//
-radio_device_t radio_d868uv = {
-    "Anytone AT-D868UV",
-    d868uv_download,
-    d868uv_upload,
-    d868uv_is_compatible,
-    d868uv_read_image,
-    d868uv_save_image,
-    d868uv_print_version,
-    d868uv_print_config,
-    d868uv_verify_config,
-    d868uv_parse_parameter,
-    d868uv_parse_header,
-    d868uv_parse_row,
-    d868uv_update_timestamp,
-    d868uv_write_csv,
-};
-
-//
-// Anytone AT-D878UV
-//
-radio_device_t radio_d878uv = {
-    "Anytone AT-D878UV",
-    d868uv_download,
-    d868uv_upload,
-    d868uv_is_compatible,
-    d868uv_read_image,
-    d868uv_save_image,
-    d868uv_print_version,
-    d868uv_print_config,
-    d868uv_verify_config,
-    d868uv_parse_parameter,
-    d868uv_parse_header,
-    d868uv_parse_row,
-    d868uv_update_timestamp,
-    d868uv_write_csv,
-};
 
 //
 // BTECH DMR-6x2
 //
-//radio_device_t radio_dmr6x2 = {
-//    "BTECH DMR-6x2",
-//    d868uv_download,
-//    d868uv_upload,
-//    d868uv_is_compatible,
-//    d868uv_read_image,
-//    d868uv_save_image,
-//    d868uv_print_version,
-//    d868uv_print_config,
-//    d868uv_verify_config,
-//    d868uv_parse_parameter,
-//    d868uv_parse_header,
-//    d868uv_parse_row,
-//    d868uv_update_timestamp,
-//    d868uv_write_csv,
-//};
+radio_device_t radio_dmr6x2 = {
+    "BTECH DMR-6x2",
+    bt6x2_download,
+    bt6x2_upload,
+    bt6x2_is_compatible,
+    bt6x2_read_image,
+    bt6x2_save_image,
+    bt6x2_print_version,
+    bt6x2_print_config,
+    bt6x2_verify_config,
+    bt6x2_parse_parameter,
+    bt6x2_parse_header,
+    bt6x2_parse_row,
+    bt6x2_update_timestamp,
+    bt6x2_write_csv,
+};
