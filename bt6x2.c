@@ -271,12 +271,15 @@ typedef struct {
     uint8_t  _unused7;
 
     // 30-7
-#define NOT_CH_NAME_OFFSET (39-(2*16))
-#define TALK_ALERT_OFFSET (41-NOT_CH_NAME_OFFSET)
+#define HOLD_TIME_OFFSET (39-(2*16)+10)
+#define HOLD_TIME_SIZE 2
+#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET)
 #define GPS_UNITS_OFFSET (2+(8*16)+2+4)
+#define MANUAL_HOLD_TIME_OFFSET (9+16)
+#define MANUAL_HOLD_TIME_SIZE 2
     // Bytes 8-0x5ff.
-    uint8_t  _unused22[NOT_CH_NAME_OFFSET];
-    uint8_t  _ch_name;
+    uint8_t  _unused22[HOLD_TIME_OFFSET];
+    uint8_t  hold_time[HOLD_TIME_SIZE];
     
     uint8_t  _unused23[TALK_ALERT_OFFSET];
     uint8_t  talk_alert;
@@ -284,7 +287,10 @@ typedef struct {
     uint8_t  _unused24[GPS_UNITS_OFFSET];
     uint8_t  gps_units;
 
-    uint8_t  _unused8[0x5f8-NOT_CH_NAME_OFFSET-1-TALK_ALERT_OFFSET-1-GPS_UNITS_OFFSET-1];
+    uint8_t  _unused25[MANUAL_HOLD_TIME_OFFSET]; // 716d0
+    uint8_t  manual_hold_time[MANUAL_HOLD_TIME_SIZE];
+
+    uint8_t  _unused8[0x5f8-MANUAL_HOLD_TIME_OFFSET-MANUAL_HOLD_TIME_SIZE-HOLD_TIME_OFFSET-HOLD_TIME_SIZE-TALK_ALERT_OFFSET-1-GPS_UNITS_OFFSET-1];
 
     // Bytes 0x600-0x61f
     uint8_t intro_line1[16];    // Up to 14 characters
@@ -735,9 +741,13 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Talk Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
     fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
+    fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
+    fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
     fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
     fprintf(out, "\nGPS Units: %d",gs->gps_units);
     fprintf(out, "\nCh Name: %d",gs->ch_name);
+    fprintf(out, "\nHold Time: %d",gs->hold_time[0]);
+    fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
     fprintf(out, "\n");
 }
 
@@ -1562,6 +1572,16 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Ch Name", param) == 0) {
         gs->ch_name = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Hold Time", param) == 0) {
+        gs->hold_time[0] = strtoul(value, 0, 0);
+        gs->hold_time[1] = gs->hold_time[0];
+        return;
+    }
+    if (strcasecmp ("Manual Hold Time", param) == 0) {
+        gs->manual_hold_time[0] = strtoul(value, 0, 0);
+        gs->manual_hold_time[1] = gs->manual_hold_time[0];
         return;
     }
     fprintf(stderr, "Bt Unknown parameter: %s = %s\n", param, value);
