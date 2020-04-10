@@ -88,11 +88,16 @@ void radio_print_version(FILE *out)
 //
 // Connect to the radio and identify the type of device.
 //
-void radio_connect()
+void radio_connect(int radioEnum)
 {
-//    device = radio_tab[12].device;
-//    fprintf(stderr, "Connect to %s.\n", device->name);
-//    return;
+
+  if(radioEnum != -1)
+  {
+    device = radio_tab[radioEnum].device;
+    fprintf(stderr, "Connect to %s.\n", device->name);
+    return;
+  }
+
     const char *ident;
     int i;
 

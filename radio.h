@@ -30,7 +30,7 @@
 // Connect to the radio via the serial port.
 // Identify the type of device.
 //
-void radio_connect(void);
+void radio_connect(int);
 
 //
 // Close the serial port.
