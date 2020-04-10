@@ -285,7 +285,8 @@ typedef struct {
 
 } general_settings_t;
 // 71630:2
-#define TX_ALERT_OFFSET 3*16-7
+#define TX_ALERT_OFFSET (3*16-7)
+#define CH_NAME_OFFSET (-2-5)
 
 //
 // Radio ID table: 250 entries, 0x1f40 bytes at 0x02580000.
@@ -773,6 +774,7 @@ static void print_intro(FILE * out, int verbose)
 	}
 
 	fprintf(out, "\nTx Alert: %d", gs->_unused8[TX_ALERT_OFFSET]);
+	fprintf(out, "\nCh Name: %d", *(gs->_unused8 + CH_NAME_OFFSET));
 	fprintf(out, "\n");
 }
 
@@ -1625,6 +1627,10 @@ static void d868uv_parse_parameter(radio_device_t * radio, char *param,
 	char *e;
 	if (strcasecmp("Tx Alert", param) == 0) {
 		gs->_unused8[TX_ALERT_OFFSET] = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Ch Name", param) == 0) {
+		*(gs->_unused8 + CH_NAME_OFFSET) = strtoul(value, &e, 10);
 		return;
 	}
 
