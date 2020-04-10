@@ -288,6 +288,7 @@ typedef struct {
 #define TX_ALERT_OFFSET (3*16-7)
 #define CH_NAME_OFFSET (-2-5)
 #define GPS_UNITS_OFFSET (TX_ALERT_OFFSET+(8*16)+9)
+#define HOLD_TIME_OFFSET (TX_ALERT_OFFSET-(1*16)-8)
 
 //
 // Radio ID table: 250 entries, 0x1f40 bytes at 0x02580000.
@@ -775,12 +776,15 @@ static void print_intro(FILE * out, int verbose)
 	}
 
 	fprintf(out, "\n\n# General Settings");
-	fprintf(out, "\n# Tx Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
+	fprintf(out,
+		"\n# Tx Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
 	fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
 	fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
+fprintf(out,"\n# Hold Time: 2-2s, 31-Unlimited");
 	fprintf(out, "\nTx Alert: %d", gs->_unused8[TX_ALERT_OFFSET]);
 	fprintf(out, "\nCh Name: %d", *(gs->_unused8 + CH_NAME_OFFSET));
 	fprintf(out, "\nGPS Units: %d", *(gs->_unused8 + GPS_UNITS_OFFSET));
+	fprintf(out, "\nHold Time: %d", *(gs->_unused8 + HOLD_TIME_OFFSET));
 	fprintf(out, "\n");
 }
 
@@ -1642,6 +1646,12 @@ static void d868uv_parse_parameter(radio_device_t * radio, char *param,
 	if (strcasecmp("GPS Units", param) == 0) {
 		*(gs->_unused8 + GPS_UNITS_OFFSET) = strtoul(value, &e, 10);
 		return;
+	}
+	if (strcasecmp("Hold Time", param) == 0) {
+		*(gs->_unused8 + HOLD_TIME_OFFSET) = strtoul(value, &e, 10);
+		*(gs->_unused8 + HOLD_TIME_OFFSET + 1) =
+		    *(gs->_unused8 + HOLD_TIME_OFFSET);
+		    return;
 	}
 
 	fprintf(stderr, "Unknown parameter: %s = %s\n", param, value);
