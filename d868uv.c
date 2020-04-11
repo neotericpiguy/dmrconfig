@@ -284,6 +284,8 @@ typedef struct {
 	uint8_t _unused630[16];	// 0xff
 
 } general_settings_t;
+// 071600 
+#define KEY_BEEP_OFFSET (3*16-8-(3*16))
 // 71630:2
 #define TX_ALERT_OFFSET (3*16-7)
 #define CH_NAME_OFFSET (-2-5)
@@ -785,6 +787,7 @@ static void print_intro(FILE * out, int verbose)
 	fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
 	fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
 	fprintf(out, "\n# Mic Level: 0-1, 2-3, 4-5");
+	fprintf(out, "\n# Key Beep : 0-Off, 1-On");
 	fprintf(out, "\nTx Alert: %d", gs->_unused8[TX_ALERT_OFFSET]);
 	fprintf(out, "\nCh Name: %d", *(gs->_unused8 + CH_NAME_OFFSET));
 	fprintf(out, "\nGPS Units: %d", *(gs->_unused8 + GPS_UNITS_OFFSET));
@@ -792,6 +795,7 @@ static void print_intro(FILE * out, int verbose)
 	fprintf(out, "\nManual Hold Time: %d",
 		*(gs->_unused8 + MANUAL_HOLD_TIME_OFFSET));
 	fprintf(out, "\nMic Level: %d", *(gs->_unused8 + MIC_LEVEL_OFFSET));
+	fprintf(out, "\nKey Beep: %d", gs->_unused8[KEY_BEEP_OFFSET]);
 	fprintf(out, "\n");
 }
 
@@ -1669,6 +1673,10 @@ static void d868uv_parse_parameter(radio_device_t * radio, char *param,
 	}
 	if (strcasecmp("Mic Level", param) == 0) {
 		*(gs->_unused8 + MIC_LEVEL_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Key Beep", param) == 0) {
+		*(gs->_unused8 + KEY_BEEP_OFFSET) = strtoul(value, &e, 10);
 		return;
 	}
 
