@@ -294,6 +294,18 @@ typedef struct {
 #define MANUAL_HOLD_TIME_OFFSET (TX_ALERT_OFFSET+(10*16)+5)
 #define MIC_LEVEL_OFFSET (7)
 
+#define PF1_SHORT_OFFSET (KEY_BEEP_OFFSET+(1*16))
+#define PF2_SHORT_OFFSET (PF1_SHORT_OFFSET+1)
+#define PF3_SHORT_OFFSET (PF1_SHORT_OFFSET+2)
+#define P1_SHORT_OFFSET  (PF1_SHORT_OFFSET+3)
+#define P2_SHORT_OFFSET  (PF1_SHORT_OFFSET+4)
+
+#define PF1_LONG_OFFSET (KEY_BEEP_OFFSET+(4*16)+1)
+#define PF2_LONG_OFFSET (PF1_LONG_OFFSET+1)
+#define PF3_LONG_OFFSET (PF1_LONG_OFFSET+2)
+#define P1_LONG_OFFSET  (PF1_LONG_OFFSET+3)
+#define P2_LONG_OFFSET  (PF1_LONG_OFFSET+4)
+
 //
 // Radio ID table: 250 entries, 0x1f40 bytes at 0x02580000.
 //
@@ -788,6 +800,17 @@ static void print_intro(FILE * out, int verbose)
 	fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
 	fprintf(out, "\n# Mic Level: 0-1, 2-3, 4-5");
 	fprintf(out, "\n# Key Beep : 0-Off, 1-On");
+	fprintf(out, "\n# Pf1: 10-scan, 28-DigiMon");
+	fprintf(out,
+		"\n# 0-off 1-volt 2-tx power 3-talkaround 4-reverse 5-encrypt 6-call 7-vox 8-vfo/mr 9-sub ptt");
+	fprintf(out,
+		"\n# 10-scan 11-fm radio 12-alarm 13-record switch 14-record 15-messages 16-dial 17-gps info 18-monitor 19-main choose");
+	fprintf(out,
+		"\n# 20-one touch 1 21-one touch 2 22-one touch 3 23-one touch 4 24-one touch 5 25-one touch 6 26-work alone 27-nuisance delete 28-digimonitor 29-sub ch switch");
+	fprintf(out,
+		"\n# 30-prior zone 31-program scan 32-mic feature 33-lastcall reply 34-switch chtype 35-simp repeater 36-measurement 37-chan measure 38-max vol set 39-slot set");
+	fprintf(out,
+		"\n# 40-ana sq set 41-roaming 42-zone sselect 43-romaing set 44-fixtiem mute 45-ctc/dcs set 46-aprs type 47-aprs set");
 	fprintf(out, "\nTx Alert: %d", gs->_unused8[TX_ALERT_OFFSET]);
 	fprintf(out, "\nCh Name: %d", *(gs->_unused8 + CH_NAME_OFFSET));
 	fprintf(out, "\nGPS Units: %d", *(gs->_unused8 + GPS_UNITS_OFFSET));
@@ -796,6 +819,16 @@ static void print_intro(FILE * out, int verbose)
 		*(gs->_unused8 + MANUAL_HOLD_TIME_OFFSET));
 	fprintf(out, "\nMic Level: %d", *(gs->_unused8 + MIC_LEVEL_OFFSET));
 	fprintf(out, "\nKey Beep: %d", gs->_unused8[KEY_BEEP_OFFSET]);
+	fprintf(out, "\nPf1 Short: %d", *(gs->_unused8 + PF1_SHORT_OFFSET));
+	fprintf(out, "\nPf2 Short: %d", *(gs->_unused8 + PF2_SHORT_OFFSET));
+	fprintf(out, "\nPf3 Short: %d", *(gs->_unused8 + PF3_SHORT_OFFSET));
+	fprintf(out, "\nP1 Short: %d", *(gs->_unused8 + P1_SHORT_OFFSET));
+	fprintf(out, "\nP2 Short: %d", *(gs->_unused8 + P2_SHORT_OFFSET));
+	fprintf(out, "\nPf1 Long: %d", *(gs->_unused8 + PF1_LONG_OFFSET));
+	fprintf(out, "\nPf2 Long: %d", *(gs->_unused8 + PF2_LONG_OFFSET));
+	fprintf(out, "\nPf3 Long: %d", *(gs->_unused8 + PF3_LONG_OFFSET));
+	fprintf(out, "\nP1 Long: %d", *(gs->_unused8 + P1_LONG_OFFSET));
+	fprintf(out, "\nP2 Long: %d", *(gs->_unused8 + P2_LONG_OFFSET));
 	fprintf(out, "\n");
 }
 
@@ -1677,6 +1710,48 @@ static void d868uv_parse_parameter(radio_device_t * radio, char *param,
 	}
 	if (strcasecmp("Key Beep", param) == 0) {
 		*(gs->_unused8 + KEY_BEEP_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+
+	if (strcasecmp("Pf1 Short", param) == 0) {
+		*(gs->_unused8 + PF1_SHORT_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Pf2 Short", param) == 0) {
+		*(gs->_unused8 + PF2_SHORT_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Pf3 Short", param) == 0) {
+		*(gs->_unused8 + PF3_SHORT_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("P1 Short", param) == 0) {
+		*(gs->_unused8 + P1_SHORT_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("P2 Short", param) == 0) {
+		*(gs->_unused8 + P2_SHORT_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+
+	if (strcasecmp("Pf1 Long", param) == 0) {
+		*(gs->_unused8 + PF1_LONG_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Pf2 Long", param) == 0) {
+		*(gs->_unused8 + PF2_LONG_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Pf3 Long", param) == 0) {
+		*(gs->_unused8 + PF3_LONG_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("P1 Long", param) == 0) {
+		*(gs->_unused8 + P1_LONG_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("P2 Long", param) == 0) {
+		*(gs->_unused8 + P2_LONG_OFFSET) = strtoul(value, &e, 10);
 		return;
 	}
 
