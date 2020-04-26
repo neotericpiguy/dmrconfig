@@ -293,6 +293,7 @@ typedef struct {
 #define HOLD_TIME_OFFSET (TX_ALERT_OFFSET-(1*16)-8)
 #define MANUAL_HOLD_TIME_OFFSET (TX_ALERT_OFFSET+(10*16)+5)
 #define MIC_LEVEL_OFFSET (7)
+#define IDLE_TONE_OFFSET (TX_ALERT_OFFSET+5)
 
 #define PF1_SHORT_OFFSET (KEY_BEEP_OFFSET+(1*16))
 #define PF2_SHORT_OFFSET (PF1_SHORT_OFFSET+1)
@@ -794,6 +795,7 @@ static void print_intro(FILE * out, int verbose)
 	fprintf(out, "\n\n# General Settings");
 	fprintf(out,
 		"\n# Tx Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
+	fprintf(out, "\n# Idle Tone: 0-off, 1-on");
 	fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
 	fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
 	fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
@@ -811,6 +813,7 @@ static void print_intro(FILE * out, int verbose)
 		"\n# 30-prior zone 31-program scan 32-mic feature 33-lastcall reply 34-switch chtype 35-simp repeater 36-measurement 37-chan measure 38-max vol set 39-slot set");
 	fprintf(out,
 		"\n# 40-ana sq set 41-roaming 42-zone sselect 43-romaing set 44-fixtiem mute 45-ctc/dcs set 46-aprs type 47-aprs set");
+	fprintf(out, "\nIdle Tone: %d", gs->_unused8[IDLE_TONE_OFFSET]);
 	fprintf(out, "\nTx Alert: %d", gs->_unused8[TX_ALERT_OFFSET]);
 	fprintf(out, "\nCh Name: %d", *(gs->_unused8 + CH_NAME_OFFSET));
 	fprintf(out, "\nGPS Units: %d", *(gs->_unused8 + GPS_UNITS_OFFSET));
@@ -1679,6 +1682,10 @@ static void d868uv_parse_parameter(radio_device_t * radio, char *param,
 	}
 
 	char *e;
+	if (strcasecmp("Idle Tone", param) == 0) {
+		gs->_unused8[IDLE_TONE_OFFSET] = strtoul(value, &e, 10);
+		return;
+	}
 	if (strcasecmp("Tx Alert", param) == 0) {
 		gs->_unused8[TX_ALERT_OFFSET] = strtoul(value, &e, 10);
 		return;
