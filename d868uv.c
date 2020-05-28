@@ -286,6 +286,10 @@ typedef struct {
 } general_settings_t;
 // 071600 
 #define KEY_BEEP_OFFSET (3*16-8-(3*16))
+
+
+#define LIGHT_TIME_OFFSET (KEY_BEEP_OFFSET + (2*16) + 8)
+
 // 71630:2
 #define TX_ALERT_OFFSET (3*16-7)
 #define CH_NAME_OFFSET (-2-5)
@@ -813,6 +817,7 @@ static void print_intro(FILE * out, int verbose)
 		"\n# 30-prior zone 31-program scan 32-mic feature 33-lastcall reply 34-switch chtype 35-simp repeater 36-measurement 37-chan measure 38-max vol set 39-slot set");
 	fprintf(out,
 		"\n# 40-ana sq set 41-roaming 42-zone sselect 43-romaing set 44-fixtiem mute 45-ctc/dcs set 46-aprs type 47-aprs set");
+	fprintf(out, "\n# Light Time: 0-Always, 1-5, 2-10, 3-15, 4-20, 5-25, 6-30, 7-60, 8-120, 9-180, 10-4Min, 11-5min");
 	fprintf(out, "\nIdle Tone: %d", gs->_unused8[IDLE_TONE_OFFSET]);
 	fprintf(out, "\nTx Alert: %d", gs->_unused8[TX_ALERT_OFFSET]);
 	fprintf(out, "\nCh Name: %d", *(gs->_unused8 + CH_NAME_OFFSET));
@@ -832,6 +837,7 @@ static void print_intro(FILE * out, int verbose)
 	fprintf(out, "\nPf3 Long: %d", *(gs->_unused8 + PF3_LONG_OFFSET));
 	fprintf(out, "\nP1 Long: %d", *(gs->_unused8 + P1_LONG_OFFSET));
 	fprintf(out, "\nP2 Long: %d", *(gs->_unused8 + P2_LONG_OFFSET));
+	fprintf(out, "\nLight Time: %d", gs->_unused8[LIGHT_TIME_OFFSET]);
 	fprintf(out, "\n");
 }
 
@@ -1759,6 +1765,10 @@ static void d868uv_parse_parameter(radio_device_t * radio, char *param,
 	}
 	if (strcasecmp("P2 Long", param) == 0) {
 		*(gs->_unused8 + P2_LONG_OFFSET) = strtoul(value, &e, 10);
+		return;
+	}
+	if (strcasecmp("Light Time", param) == 0) {
+		*(gs->_unused8 + LIGHT_TIME_OFFSET) = strtoul(value, &e, 10);
 		return;
 	}
 
