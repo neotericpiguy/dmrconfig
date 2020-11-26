@@ -6,7 +6,7 @@ UNAME           = $(shell uname)
 
 OBJS            = main.o util.o radio.o dfu-libusb.o uv380.o md380.o rd5r.o \
                   gd77.o hid.o serial.o d868uv.o dm1801.o bt6x2.o
-CFLAGS         ?= -g -O -Wall -Werror 
+CFLAGS         ?= -g -O -Wall -Werror -fcommon
 CFLAGS         += -DVERSION='"$(VERSION).$(GITCOUNT)"' \
                   $(shell pkg-config --cflags libusb-1.0)
 LDFLAGS        ?= -g
