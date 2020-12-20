@@ -86,15 +86,20 @@ void radio_print_version(FILE *out)
 }
 
 //
+// Connect to the an image of a radio and identify the type of device.
+//
+void radio_sim_connect(int radio_id)
+{
+    device = radio_tab[radio_id].device;
+    fprintf(stderr, "Connect to sim %s.\n", device->name);
+    return;
+}
+
+//
 // Connect to the radio and identify the type of device.
 //
 void radio_connect()
 {
-  //////////////////////////////////
-//    device = radio_tab[12].device;
-//    fprintf(stderr, "Connect to %s.\n", device->name);
-//    return;
-  //////////////////////////////////
     const char *ident;
     int i;
 

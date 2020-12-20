@@ -258,39 +258,52 @@ typedef struct {
 typedef struct {
 
     // Bytes 0-5.
+    //71600
     uint8_t  _unused0;
     uint8_t  ch_name;
-    uint8_t  _unused1[6-2];
+    uint8_t  _unused1[4];
 
-    // Bytes 6-7.
+    // Bytes 6.
     uint8_t  power_on;          // Power-on Interface
 #define PWON_DEFAULT    0       // Default
 #define PWON_CUST_CHAR  1       // Custom Char
 #define PWON_CUST_PICT  2       // Custom Picture
 
+    // Bytes 7
     uint8_t  _unused7;
 
-    // 30-7
-#define HOLD_TIME_OFFSET (39-(2*16)+10)
+    // Bytes 8-24
+#define HOLD_TIME_OFFSET (39-(2*16)+10)         //17
+    uint8_t  _unused8[HOLD_TIME_OFFSET];
+
+    // Bytes 25-26
 #define HOLD_TIME_SIZE 2
-#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET)
-#define GPS_UNITS_OFFSET (2+(8*16)+2+4)
-#define MANUAL_HOLD_TIME_OFFSET (9+16)
-#define MANUAL_HOLD_TIME_SIZE 2
-    // Bytes 8-0x5ff.
-    uint8_t  _unused22[HOLD_TIME_OFFSET];
     uint8_t  hold_time[HOLD_TIME_SIZE];
     
-    uint8_t  _unused23[TALK_ALERT_OFFSET];
+    // Bytes 27-50
+#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET) //24
+    uint8_t  _unused27[TALK_ALERT_OFFSET];
+
+    // Bytes 51
     uint8_t  talk_alert;
 
-    uint8_t  _unused24[GPS_UNITS_OFFSET];
+    // Bytes 52-187
+#define GPS_UNITS_OFFSET (2+(8*16)+2+4)         //136
+    uint8_t  _unused52[GPS_UNITS_OFFSET];
+
+    // Byte 188
     uint8_t  gps_units;
 
-    uint8_t  _unused25[MANUAL_HOLD_TIME_OFFSET]; // 716d0
+    // Bytes 189-214
+#define MANUAL_HOLD_TIME_OFFSET (9+16)          //25
+    uint8_t  _unused189[MANUAL_HOLD_TIME_OFFSET]; // 716d0
+
+    // Bytes 215
+#define MANUAL_HOLD_TIME_SIZE                   2
     uint8_t  manual_hold_time[MANUAL_HOLD_TIME_SIZE];
 
-    uint8_t  _unused8[0x5f8-MANUAL_HOLD_TIME_OFFSET-MANUAL_HOLD_TIME_SIZE-HOLD_TIME_OFFSET-HOLD_TIME_SIZE-TALK_ALERT_OFFSET-1-GPS_UNITS_OFFSET-1];
+    // Bytes 216-1535
+    uint8_t  _unused216[1320];
 
     // Bytes 0x600-0x61f
     uint8_t intro_line1[16];    // Up to 14 characters
@@ -1550,7 +1563,7 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
 
     general_settings_t *gs = GET_SETTINGS();
-    gs->power_on = PWON_CUST_PICT;
+//    gs->power_on = PWON_CUST_PICT;
 
     if (strcasecmp ("Intro Line 1", param) == 0) {
         ascii_decode_uppercase(gs->intro_line1, value, 14, 0);
@@ -1650,7 +1663,7 @@ static void setup_channel(radio_device_t *radio, int i, int mode, char *name,
     ch->color_code          = colorcode;
     ch->tx_permit           = admit;
     ch->enh_encryption      = enc_type;
-    ch->id_index	    = radioid;
+    ch->id_index	          = radioid;
     ch->encryption          = enc_key;
     ch->contact_index       = contact - 1;
     ch->group_list_index    = grouplist - 1;

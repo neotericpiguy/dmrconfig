@@ -140,14 +140,14 @@ int main(int argc, char **argv)
         }
 
     } else if (verify_flag) {
-        if (argc != 1)
-	    usage();
+      if (argc != 1)
+        usage();
 
-	// Verify text config file.
-	radio_connect();
-	radio_parse_config(argv[0]);
-	radio_verify_config();
-	radio_disconnect();
+      // Verify text config file.
+      radio_connect();
+      radio_parse_config(argv[0]);
+      radio_verify_config();
+      radio_disconnect();
 
     } else if (read_flag) {
         if (argc != 0)

@@ -1691,7 +1691,6 @@ static int parse_digital_channel(radio_device_t *radio, int first_row, char *lin
     int enc_type, enc_key;
     int colorcode, timeslot, grouplist, radioid, contact;
     double rx_mhz, tx_mhz;
-    printf("a1398192837192837\n");
 
     if (sscanf(line, "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
         num_str, name_str, rxfreq_str, offset_str,
