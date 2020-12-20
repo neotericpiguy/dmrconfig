@@ -26,8 +26,6 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-void radio_sim_connect(int radio_id);
-
 //
 // Connect to the radio via the serial port.
 // Identify the type of device.

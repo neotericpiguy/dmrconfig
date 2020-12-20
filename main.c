@@ -154,17 +154,10 @@ int main(int argc, char **argv)
             usage();
 
         // Dump device to image file.
-        //////////////////////////////////
         radio_connect();
         radio_download();
         radio_disconnect();
         radio_save_image("device.img");
-
-        //////////////////////////////////
-//        radio_connect();
-//        radio_read_image("./hold/device.img.max");
-//        radio_print_version(stdout);
-        //////////////////////////////////
 
         // Print configuration to file.
         const char *filename = "device.conf";
