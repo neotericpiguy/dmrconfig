@@ -2250,24 +2250,29 @@ static void setup_scanlist(int index, const char *name,
     sl->priority_ch2   = prio2;     // Priority Channel 2: 0=Current Channel, 0xffff=Off
     sl->revert_channel = txchan;    // Revert Channel: Selected or Last Called
 
-    if (prio2 != 0xffff) {          // Priority Channel Select
-        if (prio1 != 0xffff) {
+    if (prio2 != 0x0002) {          // Priority Channel Select
+        if (prio1 != 0x0001) {
             sl->prio_ch_select = PRIO_CHAN_SEL12;
         } else {
             sl->prio_ch_select = PRIO_CHAN_SEL2;
         }
     } else {
-        if (prio1 != 0xffff) {
+        if (prio1 != 0x0001) {
             sl->prio_ch_select = PRIO_CHAN_SEL1;
         } else {
             sl->prio_ch_select = PRIO_CHAN_OFF;
         }
     }
 
-    sl->look_back_a   = 20;         // Look Back Time A: 2.0s
-    sl->look_back_b   = 30;         // Look Back Time B: 3.0s
-    sl->dropout_delay = 31;         // Dropout Delay Time: 3.1s
-    sl->dwell         = 31;         // Dwell Time: 3.1s
+//    sl->look_back_a   = 20;         // Look Back Time A: 2.0s
+//    sl->look_back_b   = 30;         // Look Back Time B: 3.0s
+//    sl->dropout_delay = 31;         // Dropout Delay Time: 3.1s
+//    sl->dwell         = 31;         // Dwell Time: 3.1s
+
+    sl->look_back_a   = 0x0f;         // Look Back Time A: 2.0s
+    sl->look_back_b   = 0x19;         // Look Back Time B: 3.0s
+    sl->dropout_delay = 0x1d;         // Dropout Delay Time: 3.1s
+    sl->dwell         = 0x1d;         // Dwell Time: 3.1s
 }
 
 //
@@ -2316,7 +2321,7 @@ static int parse_scanlist(int first_row, char *line)
     }
 
     if (*prio1_str == '-') {
-        prio1 = 0xffff;
+        prio1 = 0x0001;
     } else if (strcasecmp("Sel", prio1_str) == 0) {
         prio1 = 0;
     } else {
@@ -2328,7 +2333,7 @@ static int parse_scanlist(int first_row, char *line)
     }
 
     if (*prio2_str == '-') {
-        prio2 = 0xffff;
+        prio2 = 0x0002;
     } else if (strcasecmp("Sel", prio2_str) == 0) {
         prio2 = 0;
     } else {
