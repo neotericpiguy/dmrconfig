@@ -963,10 +963,11 @@ static void print_digital_channels(FILE *out, radio_device_t *radio, int verbose
         fprintf(out, "# 13) Time slot: 1 or 2\n");
         fprintf(out, "# 14) Receive group list: - or index in Grouplist table\n");
         fprintf(out, "# 15) Radio ID\n");
-        fprintf(out, "# 16) Contact for transmit: - or index in Contacts table\n");
+        fprintf(out, "# 16) Bandwidth in kHz: 12.5, 25\n");
+        fprintf(out, "# 17) Contact for transmit: - or index in Contacts table\n");
         fprintf(out, "#\n");
     }
-    fprintf(out, "Digital Name             Receive   Transmit Power Scan TOT RO Admit EncType EncKey  Color Slot RxGL RadioID TxContact");
+    fprintf(out, "Digital Name             Receive   Transmit Power Scan TOT RO Admit EncType EncKey  Color Slot RxGL RadioID TxContact Width");
     fprintf(out, "\n");
     for (i=0; i<NCHAN; i++) {
         channel_t *ch = get_channel(i);
@@ -1012,14 +1013,15 @@ static void print_digital_channels(FILE *out, radio_device_t *radio, int verbose
             fprintf(out, "%-4d", ch->contact_index + 1);
 
         // Print contact name as a comment.
-        if (ch->contact_index != 0xffff) {
-            contact_t *ct = get_contact(ch->contact_index);
-
-            if (ct) {
-                fprintf(out, " # ");
-                print_ascii(out, ct->name, 16, 0);
-            }
-        }
+//        if (ch->contact_index != 0xffff) {
+//            contact_t *ct = get_contact(ch->contact_index);
+//
+//            if (ct) {
+//                fprintf(out, " # ");
+//                print_ascii(out, ct->name, 16, 0);
+//            }
+//        }
+        fprintf(out, "      %s", BANDWIDTH[ch->bandwidth]);
 
         fprintf(out, "\n");
     }
@@ -1770,16 +1772,18 @@ static int parse_digital_channel(radio_device_t *radio, int first_row, char *lin
     char enc_type_str[256], enc_key_str[256];
     char tot_str[256], rxonly_str[256], admit_str[256], colorcode_str[256];
     char slot_str[256], grouplist_str[256], radioid_str[256], contact_str[256];
+    char width_str[256];
     int num, power, scanlist, rxonly, admit;
     int enc_type, enc_key;
     int colorcode, timeslot, grouplist, radioid, contact;
+    int width;
     double rx_mhz, tx_mhz;
 
-    if (sscanf(line, "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
+    if (sscanf(line, "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s",
         num_str, name_str, rxfreq_str, offset_str,
         power_str, scanlist_str,
         tot_str, rxonly_str, admit_str, enc_type_str, enc_key_str, colorcode_str,
-        slot_str, grouplist_str, radioid_str, contact_str) != 16)
+        slot_str, grouplist_str, radioid_str, contact_str, width_str) != 17)
         return 0;
 
     num = atoi(num_str);
@@ -1812,6 +1816,15 @@ badtx:  fprintf(stderr, "Bad transmit frequency.\n");
         power = POWER_TURBO;
     } else {
         fprintf(stderr, "Bad power level.\n");
+        return 0;
+    }
+
+    if (strcasecmp ("12.5", width_str) == 0) {
+        width = BW_12_5_KHZ;
+    } else if (strcasecmp ("25", width_str) == 0) {
+        width = BW_25_KHZ;
+    } else {
+        fprintf (stderr, "Bad width.\n");
         return 0;
     }
 
@@ -1916,7 +1929,7 @@ badtx:  fprintf(stderr, "Bad transmit frequency.\n");
 
     setup_channel(radio, num-1, MODE_DIGITAL, name_str, rx_mhz, tx_mhz,
         power, scanlist, rxonly, admit, enc_type, enc_key, colorcode, timeslot,
-        grouplist, radioid, contact, 0, 0, BW_12_5_KHZ);
+        grouplist, radioid, contact, 0, 0, width);
 
     radio->channel_count++;
     return 1;
