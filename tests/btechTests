@@ -1,0 +1,51 @@
+#!/bin/bash
+
+set -e
+
+tmpImg=`mktemp`
+tmpConf=`mktemp`
+
+trap cleanup 0 SIGTERM SIGKILL
+
+_testEq() {
+  if [ "$1" == "$2" ]; then
+    echo -en "\e[32m[PASS]"
+  else
+    echo -en "\e[31m[FAIL] $1 != $2"
+    echo -e "\e[0m $3"
+    exit 1
+  fi
+  echo -e "\e[0m $3"
+}
+
+cleanup() {
+  echo "Cleaning"
+  rm -rf $tmpImg $tmpConf device.img
+}
+
+#talkPermitTest() {
+#   xxd -r ./tests/bt6x2/talkPermit/analog.hex > $tmpImg
+#   ./dmrconfig
+#}
+
+touchTest() {
+  xxd -r ./tests/bt6x2/talkPermit/analog.hex > $tmpImg
+  ./dmrconfig $tmpImg > $tmpConf
+  vi $tmpConf
+  ./dmrconfig -c $tmpImg $tmpConf
+  if  cmp $tmpImg device.img; then
+    echo -en "\e[32mPASS"
+  else
+    echo -en "\e[32mFAIL"
+    vim -d ./tests/bt6x2/talkPermit/analog.hex <(xxd device.img) 
+    exit 1
+  fi
+  echo -e "\e[0m ${FUNCNAME[0]}"
+}
+
+main() {
+  touchTest
+#  talkPermitTest
+}
+
+main $@
