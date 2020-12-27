@@ -1660,14 +1660,22 @@ static void setup_channel(radio_device_t *radio, int i, int mode, char *name,
     ch->bandwidth           = width;
     ch->rx_only             = rxonly;
     ch->slot2               = (timeslot == 2);
-    ch->color_code          = colorcode;
+    if(mode == MODE_ANALOG)
+      ch->color_code          = colorcode + 1;
+    else
+      ch->color_code          = colorcode ;
     ch->tx_permit           = admit;
     ch->enh_encryption      = enc_type;
     ch->id_index	          = radioid;
     ch->encryption          = enc_key;
-    ch->contact_index       = contact - 1;
+    if(contact - 1 < 0)
+      ch->contact_index       = 0;
+    else
+      ch->contact_index       = contact - 1;
     ch->group_list_index    = grouplist - 1;
-    ch->custom_ctcss        = 251.1 * 10;
+    if(grouplist - 1 < 0)
+      ch->group_list_index = 0;
+    ch->custom_ctcss        = 131.8 * 10;
 
     if (radio == &radio_dmr6x2) {
         // Radio DMR-6x2 has eight scan lists per channel.
@@ -1679,7 +1687,10 @@ static void setup_channel(radio_device_t *radio, int i, int mode, char *name,
     }
 
     // rxtone and txtone are positive for DCS and negative for CTCSS.
-    if (rxtone > 0) {                   // Receive DCS
+    if(rxtone == 0) {
+        ch->ctcss_receive = 0x15;
+        ch->dcs_receive = 0x13;
+    }else if (rxtone > 0) {                   // Receive DCS
         ch->rx_dcs = 1;
         ch->dcs_receive = rxtone - 1;
     } else if (rxtone < 0) {            // Receive CTCSS
@@ -1696,7 +1707,10 @@ static void setup_channel(radio_device_t *radio, int i, int mode, char *name,
         ch->squelch_mode = SQ_TONE;
     }
 
-    if (txtone > 0) {                   // Transmit DCS
+    if(txtone == 0) {
+        ch->ctcss_transmit = 0x15;
+        ch->dcs_transmit = 0x13;
+    } else if (txtone > 0) {                   // Transmit DCS
         ch->tx_dcs = 1;
         ch->dcs_transmit = txtone - 1;
     } else if (txtone < 0) {            // Transmit CTCSS
@@ -2116,7 +2130,9 @@ static int zone_append(int index, int cnum)
                 zchan_b[index] = cnum;
             } else if (i == 1) {
                 // Set B channel.
-                zchan_b[index] = cnum;
+                // TODO Remove once i figure out why this no worky
+                if(!(index == 0 && cnum == 1))
+                  zchan_b[index] = cnum;
             }
             return 1;
         }
