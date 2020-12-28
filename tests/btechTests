@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -e
+
+tmpImg=`mktemp`
+tmpConf=`mktemp`
+
+trap cleanup 0 SIGTERM SIGKILL
+
+_testEq() {
+  if [ "$1" $2 "$3" ]; then
+    echo -en "\e[32m[PASS]"
+  else
+    echo -en "\e[31m[FAIL]"
+    echo -e "\e[0m $@"
+    exit 1
+  fi
+  echo -e "\e[0m $@"
+}
+
+cleanup() {
+  echo "Cleaning"
+  rm -rf $tmpImg $tmpConf device.img
+
+  for i in "${on_exit_items[@]}"
+  do
+    echo "on_exit: $i"
+    eval $i
+  done
+}
+
+function add_on_exit()
+{
+  local n=${#on_exit_items[*]}
+  on_exit_items[$n]="$*"
+  if [[ $n -eq 0 ]]; then
+    echo "Setting trap"
+    trap cleanup EXIT
+  fi
+}
+
+
+paramTest() {
+  local beforeHex=${1?"Before hex"}
+  local afterHex=${2?"After hex"}
+  local paramName=${3?"Param Name"}
+
+  local afterImg=`mktemp`
+  local beforeImg=`mktemp`
+  local tmpConf=`mktemp`
+  local size=16
+
+  echo "Start $paramName"
+  add_on_exit "{ rm -f $afterImg $beforeImg $tmpConf; }"
+
+  local baseAddress=`diff $beforeHex $afterHex |  egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  xxd -r $beforeHex > $afterImg
+  xxd -r $afterHex > $beforeImg
+
+  diff  <(xxd -s 0x$baseAddress -l $size -c 1 $beforeImg) <(xxd -s 0x$baseAddress -l $size -c 1 $afterImg) | egrep ">"
+  local byteAddress=`diff  <(xxd -s 0x$baseAddress -l 256 -c 1 $beforeImg) <(xxd -s 0x$baseAddress -l 256 -c 1 $afterImg) | egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  echo "Target byte address: $byteAddress"
+
+  ./dmrconfig $beforeImg > $tmpConf
+  sed -r -i "s/^$paramName:.*/$paramName: 00/g" $tmpConf
+  ./dmrconfig -c $beforeImg $tmpConf
+
+  local after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
+  _testEq "00" == "$after" "$paramName"
+
+  sed -r -i "s/^$paramName:.*/$paramName: 01/g" $tmpConf
+  egrep -i "^$paramName" $tmpConf
+  ./dmrconfig -c $beforeImg $tmpConf
+  after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
+  _testEq "01" == "$after" "$paramName"
+}
+
+touchTest() {
+  xxd -r ./tests/bt6x2/talkPermit/analog.hex > $tmpImg
+  ./dmrconfig $tmpImg > $tmpConf
+  vi $tmpConf
+  ./dmrconfig -c $tmpImg $tmpConf
+  if  cmp $tmpImg device.img; then
+    echo -en "\e[32mPASS"
+  else
+    echo -en "\e[31mFAIL"
+    vim -d ./tests/bt6x2/talkPermit/analog.hex <(xxd device.img) 
+    exit 1
+  fi
+  echo -e "\e[0m ${FUNCNAME[0]}"
+}
+
+main() {
+  # TODO touchTest has been failing
+#  touchTest
+#  talkPermitTest
+  paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Alert"
+  paramTest "./tests/bt6x2/keyBeep/on.hex" "./tests/bt6x2/keyBeep/off.hex" "Key Beep"
+}
+
+main $@

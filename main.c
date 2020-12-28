@@ -140,31 +140,24 @@ int main(int argc, char **argv)
         }
 
     } else if (verify_flag) {
-        if (argc != 1)
-	    usage();
+      if (argc != 1)
+        usage();
 
-	// Verify text config file.
-	radio_connect();
-	radio_parse_config(argv[0]);
-	radio_verify_config();
-	radio_disconnect();
+      // Verify text config file.
+      radio_connect();
+      radio_parse_config(argv[0]);
+      radio_verify_config();
+      radio_disconnect();
 
     } else if (read_flag) {
         if (argc != 0)
             usage();
 
         // Dump device to image file.
-        //////////////////////////////////
         radio_connect();
         radio_download();
         radio_disconnect();
         radio_save_image("device.img");
-
-        //////////////////////////////////
-//        radio_connect();
-//        radio_read_image("./CP-Miklor-DMR-6X2.rdt");
-//        radio_print_version(stdout);
-        //////////////////////////////////
 
         // Print configuration to file.
         const char *filename = "device.conf";

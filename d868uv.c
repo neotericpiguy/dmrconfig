@@ -1528,7 +1528,7 @@ static void d868uv_parse_parameter(radio_device_t *radio, char *param, char *val
         gs->power_on = PWON_CUST_CHAR;
         return;
     }
-    fprintf(stderr, "Unknown parameter: %s = %s\n", param, value);
+    fprintf(stderr, "868 Unknown parameter: %s = %s\n", param, value);
     exit(-1);
 }
 
@@ -3117,26 +3117,6 @@ radio_device_t radio_d868uv = {
 //
 radio_device_t radio_d878uv = {
     "Anytone AT-D878UV",
-    d868uv_download,
-    d868uv_upload,
-    d868uv_is_compatible,
-    d868uv_read_image,
-    d868uv_save_image,
-    d868uv_print_version,
-    d868uv_print_config,
-    d868uv_verify_config,
-    d868uv_parse_parameter,
-    d868uv_parse_header,
-    d868uv_parse_row,
-    d868uv_update_timestamp,
-    d868uv_write_csv,
-};
-
-//
-// BTECH DMR-6x2
-//
-radio_device_t radio_dmr6x2 = {
-    "BTECH DMR-6x2",
     d868uv_download,
     d868uv_upload,
     d868uv_is_compatible,

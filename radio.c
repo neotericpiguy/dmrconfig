@@ -90,9 +90,6 @@ void radio_print_version(FILE *out)
 //
 void radio_connect()
 {
-//    device = radio_tab[12].device;
-//    fprintf(stderr, "Connect to %s.\n", device->name);
-//    return;
     const char *ident;
     int i;
 
