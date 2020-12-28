@@ -281,11 +281,12 @@ typedef struct {
     uint8_t  hold_time[HOLD_TIME_SIZE];
     
     // Bytes 27-50
-#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET) //24
+#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET-2) //24
     uint8_t  _unused27[TALK_ALERT_OFFSET];
 
     // Bytes 51
     uint8_t  talk_alert;
+    uint8_t  pad[2];
 
     // Bytes 52-187
 #define GPS_UNITS_OFFSET (2+(8*16)+2+4)         //136

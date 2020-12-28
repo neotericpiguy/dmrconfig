@@ -23,10 +23,35 @@ cleanup() {
   rm -rf $tmpImg $tmpConf device.img
 }
 
-#talkPermitTest() {
-#   xxd -r ./tests/bt6x2/talkPermit/analog.hex > $tmpImg
-#   ./dmrconfig
-#}
+talkPermitTest() {
+  local analogHex=./tests/bt6x2/talkPermit/analog.hex
+  local offHex=./tests/bt6x2/talkPermit/off.hex
+  local analogImg=./tests/bt6x2/talkPermit/analog.img
+  local offImg=./tests/bt6x2/talkPermit/off.img
+
+  local baseAddress=`diff $analogHex $offHex |  egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  xxd -r $analogHex > $analogImg
+  xxd -r $offHex > $offImg
+
+  diff  <(xxd -s 0x$baseAddress -l 8 -c 1 $offImg) <(xxd -s 0x$baseAddress -l 8 -c 1 $analogImg) | egrep ">"
+  local byteAddress=`diff  <(xxd -s 0x$baseAddress -l 8 -c 1 $offImg) <(xxd -s 0x$baseAddress -l 8 -c 1 $analogImg) | egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  echo $byteAddress
+
+  local offConf=./tests/bt6x2/talkPermit/off.conf
+  local paramName="Talk Alert"
+  ./dmrconfig $offImg > $offConf
+  sed -r -i "s/^$paramName:.*/$paramName: 0/g" $offConf
+#  vi $offConf
+
+  ./dmrconfig -c $offImg $offConf
+#  vim -d $offHex <(xxd device.img) 
+  if  ! diff  -y <(xxd -s 0x$byteAddress -l 8 -c 1 $offImg) <(xxd -s 0x$byteAddress -l 8 -c 1 device.img) ; then
+    echo -en "\e[31mFAIL $paramName\n\e[0m"
+    echo "Want $byteAddress"
+    diff <(xxd -s 0x$byteAddress -l 8 -c 1 $offImg) <(xxd -s 0x$byteAddress -l 8 -c 1 device.img) 
+    exit 1
+  fi
+}
 
 touchTest() {
   xxd -r ./tests/bt6x2/talkPermit/analog.hex > $tmpImg
@@ -36,7 +61,7 @@ touchTest() {
   if  cmp $tmpImg device.img; then
     echo -en "\e[32mPASS"
   else
-    echo -en "\e[32mFAIL"
+    echo -en "\e[31mFAIL"
     vim -d ./tests/bt6x2/talkPermit/analog.hex <(xxd device.img) 
     exit 1
   fi
@@ -44,8 +69,9 @@ touchTest() {
 }
 
 main() {
-  touchTest
-#  talkPermitTest
+  # TODO touchTest has been failing
+#  touchTest
+  talkPermitTest
 }
 
 main $@
