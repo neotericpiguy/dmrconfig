@@ -40,37 +40,36 @@ function add_on_exit()
 }
 
 
-talkPermitTest() {
-  local analogHex=./tests/bt6x2/talkPermit/analog.hex
-  local offHex=./tests/bt6x2/talkPermit/off.hex
-  local analogImg=`mktemp`
-  local offImg=`mktemp`
-  local offConf=`mktemp`
-  local paramName="Talk Alert"
+paramTest() {
+  local beforeHex=${1?"Before hex"}
+  local afterHex=${2?"After hex"}
+  local paramName=${3?"Param Name"}
 
+  local afterImg=`mktemp`
+  local beforeImg=`mktemp`
+  local tmpConf=`mktemp`
   local size=16
 
-  add_on_exit "{ rm -f $analogImg $offImg; }"
-  add_on_exit "{ rm -f $offConf; }"
+  add_on_exit "{ rm -f $afterImg $beforeImg $tmpConf; }"
 
-  local baseAddress=`diff $analogHex $offHex |  egrep ">" | sed -r "s/> //g;s/:.*//g"`
-  xxd -r $analogHex > $analogImg
-  xxd -r $offHex > $offImg
+  local baseAddress=`diff $beforeHex $afterHex |  egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  xxd -r $beforeHex > $afterImg
+  xxd -r $afterHex > $beforeImg
 
-  diff  <(xxd -s 0x$baseAddress -l $size -c 1 $offImg) <(xxd -s 0x$baseAddress -l $size -c 1 $analogImg) | egrep ">"
-  local byteAddress=`diff  <(xxd -s 0x$baseAddress -l 256 -c 1 $offImg) <(xxd -s 0x$baseAddress -l 256 -c 1 $analogImg) | egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  diff  <(xxd -s 0x$baseAddress -l $size -c 1 $beforeImg) <(xxd -s 0x$baseAddress -l $size -c 1 $afterImg) | egrep ">"
+  local byteAddress=`diff  <(xxd -s 0x$baseAddress -l 256 -c 1 $beforeImg) <(xxd -s 0x$baseAddress -l 256 -c 1 $afterImg) | egrep ">" | sed -r "s/> //g;s/:.*//g"`
   echo "Target byte address: $byteAddress"
 
-  ./dmrconfig $offImg > $offConf
-  sed -r -i "s/^$paramName:.*/$paramName: 00/g" $offConf
-  ./dmrconfig -c $offImg $offConf
+  ./dmrconfig $beforeImg > $tmpConf
+  sed -r -i "s/^$paramName:.*/$paramName: 00/g" $tmpConf
+  ./dmrconfig -c $beforeImg $tmpConf
 
   local after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
   _testEq "00" == "$after" "$paramName"
 
-  sed -r -i "s/^$paramName:.*/$paramName: 01/g" $offConf
-  egrep -i "^$paramName" $offConf
-  ./dmrconfig -c $offImg $offConf
+  sed -r -i "s/^$paramName:.*/$paramName: 01/g" $tmpConf
+  egrep -i "^$paramName" $tmpConf
+  ./dmrconfig -c $beforeImg $tmpConf
   after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
   _testEq "01" == "$after" "$paramName"
 }
@@ -93,7 +92,8 @@ touchTest() {
 main() {
   # TODO touchTest has been failing
 #  touchTest
-  talkPermitTest
+#  talkPermitTest
+  paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Alert"
 }
 
 main $@
