@@ -58,6 +58,9 @@ clean:
 install:	dmrconfig
 		install -c -s dmrconfig /usr/local/bin/dmrconfig
 
+check: dmrconfig
+		./tests/btechTests
+
 ###
 d868uv.o: d868uv.c radio.h util.h d868uv-map.h
 bt6x2.o: bt6x2.c radio.h util.h bt6x2-map.h
