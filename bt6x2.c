@@ -259,7 +259,7 @@ typedef struct {
 
     // Bytes 0-5.
     //71600
-    uint8_t  _unused0;
+    uint8_t  key_beep;
     uint8_t  ch_name;
     uint8_t  _unused1[4];
 
@@ -757,6 +757,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
     fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
+    fprintf(out, "\nKey Beep: %d",gs->key_beep);
     fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
     fprintf(out, "\nGPS Units: %d",gs->gps_units);
     fprintf(out, "\nCh Name: %d",gs->ch_name);
@@ -1576,6 +1577,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     if (strcasecmp ("Intro Line 2", param) == 0) {
         ascii_decode_uppercase(gs->intro_line2, value, 14, 0);
         gs->power_on = PWON_CUST_CHAR;
+        return;
+    }
+    if (strcasecmp ("Key Beep", param) == 0) {
+        gs->key_beep= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Talk Alert", param) == 0) {
