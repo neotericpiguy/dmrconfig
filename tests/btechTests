@@ -50,6 +50,7 @@ paramTest() {
   local tmpConf=`mktemp`
   local size=16
 
+  echo "Start $paramName"
   add_on_exit "{ rm -f $afterImg $beforeImg $tmpConf; }"
 
   local baseAddress=`diff $beforeHex $afterHex |  egrep ">" | sed -r "s/> //g;s/:.*//g"`
@@ -94,6 +95,7 @@ main() {
 #  touchTest
 #  talkPermitTest
   paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Alert"
+  paramTest "./tests/bt6x2/keyBeep/on.hex" "./tests/bt6x2/keyBeep/off.hex" "Key Beep"
 }
 
 main $@
