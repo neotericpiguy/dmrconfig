@@ -8,14 +8,14 @@ tmpConf=`mktemp`
 trap cleanup 0 SIGTERM SIGKILL
 
 _testEq() {
-  if [ "$1" == "$2" ]; then
+  if [ "$1" $2 "$3" ]; then
     echo -en "\e[32m[PASS]"
   else
-    echo -en "\e[31m[FAIL] $1 != $2"
-    echo -e "\e[0m $3"
+    echo -en "\e[31m[FAIL]"
+    echo -e "\e[0m $@"
     exit 1
   fi
-  echo -e "\e[0m $3"
+  echo -e "\e[0m $@"
 }
 
 cleanup() {
@@ -28,29 +28,31 @@ talkPermitTest() {
   local offHex=./tests/bt6x2/talkPermit/off.hex
   local analogImg=./tests/bt6x2/talkPermit/analog.img
   local offImg=./tests/bt6x2/talkPermit/off.img
+  local size=16
 
   local baseAddress=`diff $analogHex $offHex |  egrep ">" | sed -r "s/> //g;s/:.*//g"`
   xxd -r $analogHex > $analogImg
   xxd -r $offHex > $offImg
 
-  diff  <(xxd -s 0x$baseAddress -l 8 -c 1 $offImg) <(xxd -s 0x$baseAddress -l 8 -c 1 $analogImg) | egrep ">"
-  local byteAddress=`diff  <(xxd -s 0x$baseAddress -l 8 -c 1 $offImg) <(xxd -s 0x$baseAddress -l 8 -c 1 $analogImg) | egrep ">" | sed -r "s/> //g;s/:.*//g"`
-  echo $byteAddress
+  diff  <(xxd -s 0x$baseAddress -l $size -c 1 $offImg) <(xxd -s 0x$baseAddress -l $size -c 1 $analogImg) | egrep ">"
+  local byteAddress=`diff  <(xxd -s 0x$baseAddress -l 256 -c 1 $offImg) <(xxd -s 0x$baseAddress -l 256 -c 1 $analogImg) | egrep ">" | sed -r "s/> //g;s/:.*//g"`
+  echo "Target byte address: $byteAddress"
 
   local offConf=./tests/bt6x2/talkPermit/off.conf
   local paramName="Talk Alert"
-  ./dmrconfig $offImg > $offConf
-  sed -r -i "s/^$paramName:.*/$paramName: 0/g" $offConf
-#  vi $offConf
 
+  ./dmrconfig $offImg > $offConf
+  sed -r -i "s/^$paramName:.*/$paramName: 00/g" $offConf
   ./dmrconfig -c $offImg $offConf
-#  vim -d $offHex <(xxd device.img) 
-  if  ! diff  -y <(xxd -s 0x$byteAddress -l 8 -c 1 $offImg) <(xxd -s 0x$byteAddress -l 8 -c 1 device.img) ; then
-    echo -en "\e[31mFAIL $paramName\n\e[0m"
-    echo "Want $byteAddress"
-    diff <(xxd -s 0x$byteAddress -l 8 -c 1 $offImg) <(xxd -s 0x$byteAddress -l 8 -c 1 device.img) 
-    exit 1
-  fi
+
+  local after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
+  _testEq "00" == "$after" "$paramName"
+
+  sed -r -i "s/^$paramName:.*/$paramName: 01/g" $offConf
+  egrep -i "^$paramName" $offConf
+  ./dmrconfig -c $offImg $offConf
+  after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
+  _testEq "01" == "$after" "$paramName"
 }
 
 touchTest() {
