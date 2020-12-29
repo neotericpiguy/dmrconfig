@@ -269,11 +269,11 @@ typedef struct {
 #define PWON_CUST_CHAR  1       // Custom Char
 #define PWON_CUST_PICT  2       // Custom Picture
 
-    // Bytes 7
-    uint8_t  _unused7;
+    // Bytes 7-17
+    uint8_t  _unused7[11];
 
-    // Bytes 8-24
-    uint8_t  _unused8[17];
+    // Bytes 18-24
+    uint8_t  _unused18[7];
 
     // Bytes 25-26
     uint8_t  hold_time[2];
