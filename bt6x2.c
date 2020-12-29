@@ -281,7 +281,7 @@ typedef struct {
     uint8_t  p1_short; 
     uint8_t  p2_short; 
 
-    // Bytes 21-24
+    // Bytes 21-24 
     uint8_t  _unused21[4];
 
     // Bytes 25-26
@@ -294,8 +294,14 @@ typedef struct {
     uint8_t  talk_alert;
     uint8_t  pad[2];
 
-    // Bytes 52-187
-    uint8_t  _unused52[136];
+    // Bytes 52-65
+    uint8_t  _unused52[13];
+
+    // Bytes 66
+    uint8_t  pf1_long;
+
+    // Bytes 67-187
+    uint8_t  _unused67[120];
 
     // Byte 188
     uint8_t  gps_units;
@@ -768,6 +774,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nHold Time: %d",gs->hold_time[0]);
     fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
     fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
+    fprintf(out, "\nPf1 Long: %d",gs->pf1_long);
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
     fprintf(out, "\nPf3 Short: %d",gs->pf3_short);
     fprintf(out, "\nP1 Short: %d",gs->p1_short);
@@ -1616,6 +1623,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Pf1 Short", param) == 0) {
         gs->pf1_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf1 Long", param) == 0) {
+        gs->pf1_long = strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Pf2 Short", param) == 0) {
