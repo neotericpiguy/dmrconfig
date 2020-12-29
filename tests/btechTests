@@ -96,9 +96,17 @@ main() {
 #  talkPermitTest
   paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Alert"
   paramTest "./tests/bt6x2/keyBeep/on.hex" "./tests/bt6x2/keyBeep/off.hex" "Key Beep"
-  paramTest "./tests/bt6x2/pf1Short/volt.hex" "./tests/bt6x2/pf1Short/scan.hex" "Pf1 Short"
+
+  paramTest "./tests/bt6x2/pf1Short/volt.hex"    "./tests/bt6x2/pf1Short/scan.hex"    "Pf1 Short"
   paramTest "./tests/bt6x2/pf2Short/monitor.hex" "./tests/bt6x2/pf2Short/digiMon.hex" "Pf2 Short"
-  paramTest "./tests/bt6x2/pf3Short/alarm.hex" "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short"
+  paramTest "./tests/bt6x2/pf3Short/alarm.hex"   "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short"
+
+  paramTest "./tests/bt6x2/p1Short/mainChoose.hex" "./tests/bt6x2/p1Short/monitor.hex" "P1 Short"
+  paramTest "./tests/bt6x2/p2Short/vfomr.hex"      "./tests/bt6x2/p2Short/monitor.hex" "P2 Short"
+
+  paramTest "./tests/bt6x2/pf1Long/off.hex"    "./tests/bt6x2/pf1Long/volt.hex"    "Pf1 Long"
+  paramTest "./tests/bt6x2/pf2Long/off.hex"    "./tests/bt6x2/pf2Long/volt.hex"    "Pf2 Long"
+  paramTest "./tests/bt6x2/pf3Long/off.hex"    "./tests/bt6x2/pf3Long/volt.hex"    "Pf3 Long"
 }
 
 main $@

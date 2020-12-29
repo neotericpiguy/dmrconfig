@@ -780,6 +780,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
     fprintf(out, "\nPf2 Long: %d",gs->pf2_long);
     fprintf(out, "\nPf3 Short: %d",gs->pf3_short);
+    fprintf(out, "\nPf3 Long: %d",gs->pf3_long);
     fprintf(out, "\nP1 Short: %d",gs->p1_short);
     fprintf(out, "\nP2 Short: %d",gs->p2_short);
     fprintf(out, "\n");
@@ -1642,6 +1643,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Pf3 Short", param) == 0) {
         gs->pf3_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf3 Long", param) == 0) {
+        gs->pf3_long = strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("P1 Short", param) == 0) {

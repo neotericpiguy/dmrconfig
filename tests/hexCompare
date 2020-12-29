@@ -4,6 +4,8 @@ set -x
 
 main() {
   ./dmrconfig -r
+
+  mkdir -p `dirname ${1}`
   xxd device.img > ${1}.hex
   rm device.img
 }
