@@ -273,7 +273,7 @@ typedef struct {
     uint8_t  _unused7;
 
     // Bytes 8-24
-#define HOLD_TIME_OFFSET (39-(2*16)+10)         //17
+#define HOLD_TIME_OFFSET 17
     uint8_t  _unused8[HOLD_TIME_OFFSET];
 
     // Bytes 25-26
@@ -281,7 +281,7 @@ typedef struct {
     uint8_t  hold_time[HOLD_TIME_SIZE];
     
     // Bytes 27-50
-#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET-2) //24
+#define TALK_ALERT_OFFSET 22
     uint8_t  _unused27[TALK_ALERT_OFFSET];
 
     // Bytes 51
@@ -289,14 +289,14 @@ typedef struct {
     uint8_t  pad[2];
 
     // Bytes 52-187
-#define GPS_UNITS_OFFSET (2+(8*16)+2+4)         //136
+#define GPS_UNITS_OFFSET 136
     uint8_t  _unused52[GPS_UNITS_OFFSET];
 
     // Byte 188
     uint8_t  gps_units;
 
     // Bytes 189-214
-#define MANUAL_HOLD_TIME_OFFSET (9+16)          //25
+#define MANUAL_HOLD_TIME_OFFSET 25
     uint8_t  _unused189[MANUAL_HOLD_TIME_OFFSET]; // 716d0
 
     // Bytes 215
