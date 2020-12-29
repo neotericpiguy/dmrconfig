@@ -297,11 +297,13 @@ typedef struct {
     // Bytes 52-65
     uint8_t  _unused52[13];
 
-    // Bytes 66
+    // Bytes 66-68
     uint8_t  pf1_long;
+    uint8_t  pf2_long;
+    uint8_t  pf3_long;
 
-    // Bytes 67-187
-    uint8_t  _unused67[120];
+    // Bytes 69-187
+    uint8_t  _unused67[118];
 
     // Byte 188
     uint8_t  gps_units;
@@ -776,6 +778,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
     fprintf(out, "\nPf1 Long: %d",gs->pf1_long);
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
+    fprintf(out, "\nPf2 Long: %d",gs->pf2_long);
     fprintf(out, "\nPf3 Short: %d",gs->pf3_short);
     fprintf(out, "\nP1 Short: %d",gs->p1_short);
     fprintf(out, "\nP2 Short: %d",gs->p2_short);
@@ -1631,6 +1634,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Pf2 Short", param) == 0) {
         gs->pf2_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf2 Long", param) == 0) {
+        gs->pf2_long = strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Pf3 Short", param) == 0) {
