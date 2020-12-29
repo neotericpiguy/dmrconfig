@@ -272,17 +272,16 @@ typedef struct {
     // Bytes 7-15
     uint8_t  _unused7[9];
 
-    // Byte 16
+    // Byte 16-18
     uint8_t  pf1_short; 
-
-    // Byte 17
     uint8_t  pf2_short; 
-
-    // Byte 18
     uint8_t  pf3_short; 
 
-    // Bytes 19-24
-    uint8_t  _unused19[6];
+    // Bytes 19
+    uint8_t  p1_short; 
+
+    // Bytes 20-24
+    uint8_t  _unused20[5];
 
     // Bytes 25-26
     uint8_t  hold_time[2];
@@ -770,6 +769,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
     fprintf(out, "\nPf3 Short: %d",gs->pf3_short);
+    fprintf(out, "\nP1 Short: %d",gs->p1_short);
     fprintf(out, "\n");
 }
 
@@ -1622,6 +1622,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Pf3 Short", param) == 0) {
         gs->pf3_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("P1 Short", param) == 0) {
+        gs->p1_short = strtoul(value, 0, 0);
         return;
     }
     fprintf(stderr, "Bt Unknown parameter: %s = %s\n", param, value);
