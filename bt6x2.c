@@ -269,11 +269,14 @@ typedef struct {
 #define PWON_CUST_CHAR  1       // Custom Char
 #define PWON_CUST_PICT  2       // Custom Picture
 
-    // Bytes 7-17
-    uint8_t  _unused7[11];
+    // Bytes 7-15
+    uint8_t  _unused7[9];
 
-    // Bytes 18-24
-    uint8_t  _unused18[7];
+    // Byte 16
+    uint8_t  pf1_short; 
+
+    // Bytes 17-24
+    uint8_t  _unused17[8];
 
     // Bytes 25-26
     uint8_t  hold_time[2];
@@ -757,6 +760,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nCh Name: %d",gs->ch_name);
     fprintf(out, "\nHold Time: %d",gs->hold_time[0]);
     fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
+    fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
     fprintf(out, "\n");
 }
 
@@ -1597,6 +1601,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     if (strcasecmp ("Manual Hold Time", param) == 0) {
         gs->manual_hold_time[0] = strtoul(value, 0, 0);
         gs->manual_hold_time[1] = gs->manual_hold_time[0];
+        return;
+    }
+    if (strcasecmp ("Pf1 Short", param) == 0) {
+        gs->pf1_short = strtoul(value, 0, 0);
         return;
     }
     fprintf(stderr, "Bt Unknown parameter: %s = %s\n", param, value);
