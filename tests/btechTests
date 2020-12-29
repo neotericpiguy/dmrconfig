@@ -107,6 +107,9 @@ main() {
   paramTest "./tests/bt6x2/pf1Long/off.hex"    "./tests/bt6x2/pf1Long/volt.hex"    "Pf1 Long"
   paramTest "./tests/bt6x2/pf2Long/off.hex"    "./tests/bt6x2/pf2Long/volt.hex"    "Pf2 Long"
   paramTest "./tests/bt6x2/pf3Long/off.hex"    "./tests/bt6x2/pf3Long/volt.hex"    "Pf3 Long"
+
+  paramTest "./tests/bt6x2/p1Long/off.hex" "./tests/bt6x2/p1Long/volt.hex" "P1 Long"
+#  paramTest "./tests/bt6x2/p2Long/vfomr.hex"      "./tests/bt6x2/p2Long/monitor.hex" "P2 Long"
 }
 
 main $@
