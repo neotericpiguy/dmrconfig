@@ -98,6 +98,7 @@ main() {
   paramTest "./tests/bt6x2/keyBeep/on.hex" "./tests/bt6x2/keyBeep/off.hex" "Key Beep"
   paramTest "./tests/bt6x2/pf1Short/volt.hex" "./tests/bt6x2/pf1Short/scan.hex" "Pf1 Short"
   paramTest "./tests/bt6x2/pf2Short/monitor.hex" "./tests/bt6x2/pf2Short/digiMon.hex" "Pf2 Short"
+  paramTest "./tests/bt6x2/pf3Short/alarm.hex" "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short"
 }
 
 main $@

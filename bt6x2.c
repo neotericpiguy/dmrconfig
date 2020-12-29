@@ -278,8 +278,11 @@ typedef struct {
     // Byte 17
     uint8_t  pf2_short; 
 
-    // Bytes 18-24
-    uint8_t  _unused18[7];
+    // Byte 18
+    uint8_t  pf3_short; 
+
+    // Bytes 19-24
+    uint8_t  _unused19[6];
 
     // Bytes 25-26
     uint8_t  hold_time[2];
@@ -757,6 +760,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
     fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
+    fprintf(out, "\n#");
     fprintf(out, "\nKey Beep: %d",gs->key_beep);
     fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
     fprintf(out, "\nGPS Units: %d",gs->gps_units);
@@ -765,6 +769,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
     fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
+    fprintf(out, "\nPf3 Short: %d",gs->pf3_short);
     fprintf(out, "\n");
 }
 
@@ -1613,6 +1618,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Pf2 Short", param) == 0) {
         gs->pf2_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf3 Short", param) == 0) {
+        gs->pf3_short = strtoul(value, 0, 0);
         return;
     }
     fprintf(stderr, "Bt Unknown parameter: %s = %s\n", param, value);
