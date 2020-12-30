@@ -115,6 +115,8 @@ main() {
 #  touchTest
 #  talkPermitTest
 
+  paramTest "./tests/bt6x2/currentChanA/scan1.hex" "./tests/bt6x2/currentChanA/tucson7.hex" "Channel A Zone Select"
+
   paramTest "./tests/bt6x2/current_contact_display/off.hex" "./tests/bt6x2/current_contact_display/on.hex" "Current Contact Display"
   paramTest "./tests/bt6x2/auto_backlight_duration/5s.hex" "./tests/bt6x2/auto_backlight_duration/10s.hex" "Auto Backlight Duration"
 

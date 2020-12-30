@@ -288,8 +288,14 @@ typedef struct {
     // Bytes 25-26
     uint8_t  digital_hold_time[2];
     
-    // Bytes 27-38 
-    uint8_t  _unused27[12];
+    // Bytes 27-30 
+    uint8_t  _unused27[4];
+
+    // Bytes 31
+    uint8_t  channel_a_zone_select;
+
+    // Bytes 32-38
+    uint8_t  _unused32[7];
 
     // Bytes 39
     uint8_t  auto_backlight_duration; // 0x27
@@ -802,12 +808,14 @@ static void print_intro(FILE *out, int verbose)
     }
     fprintf(out, "\n\n# General Settings");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
+    fprintf(out, "\n# Channel A Zone Select: 0-Zone1, 1-Zone2");
     fprintf(out, "\n# Talk Permit: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
     fprintf(out, "\n# Idle Channel Tone: 0-Off, 1-On");
     fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
     fprintf(out, "\n#");
     fprintf(out, "\nCh Name: %d",gs->ch_name);
+    fprintf(out, "\nChannel A Zone Select: %d",gs->channel_a_zone_select);
     fprintf(out, "\nTalk Permit: %d",gs->talk_permit);
     fprintf(out, "\nIdle Channel Tone: %d",gs->idle_channel_tone);
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
@@ -816,6 +824,7 @@ static void print_intro(FILE *out, int verbose)
 
     fprintf(out, "\n\n# Display Settings");
     fprintf(out, "\n# Auto Backlight Duration: 1-5s, 2-10s");
+    fprintf(out, "\n# Current Contact Display: 0-Off, 1-On");
     fprintf(out, "\n#");
     fprintf(out, "\nAuto Backlight Duration: %d",gs->auto_backlight_duration);
     fprintf(out, "\nCurrent Contact Display: %d",gs->current_contact_display);
@@ -1703,6 +1712,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Ch Name", param) == 0) {
         gs->ch_name = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Channel A Zone Select", param) == 0) {
+        gs->channel_a_zone_select = strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Digital Hold Time", param) == 0) {
