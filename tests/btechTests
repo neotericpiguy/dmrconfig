@@ -116,6 +116,8 @@ main() {
 #  touchTest
 #  talkPermitTest
 
+  paramTest "./tests/bt6x2/digital_monitor/off.hex" "./tests/bt6x2/digital_monitor/double.hex" "Digital Monitor"
+
   paramTest "./tests/bt6x2/currentChanA/scan1.hex" "./tests/bt6x2/currentChanA/tucson7.hex" "Channel A Zone Select"
   paramTest "./tests/bt6x2/currentChanA/76.hex" "./tests/bt6x2/currentChanA/218.hex" "Channel A Zone Channel Select"
 

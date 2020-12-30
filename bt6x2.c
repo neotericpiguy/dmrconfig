@@ -333,8 +333,14 @@ typedef struct {
     uint8_t  p1_long; // 0x44
     uint8_t  p2_long; // 0x45
 
-    // Bytes 70-79
-    uint8_t  _unused70[10]; // 79-70 +1
+    // Bytes 70-72
+    uint8_t  _unused70[3];
+
+    // Bytes 73
+    uint8_t  digital_monitor;
+
+    // Bytes 74-79
+    uint8_t  _unused74[6]; 
 
     // Bytes 80 
     uint8_t  analog_call_hold_time; // 0x50
@@ -821,6 +827,7 @@ static void print_intro(FILE *out, int verbose)
     }
     fprintf(out, "\n\n# General Settings");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
+    fprintf(out, "\n# Digital Monitor: 0-Off, 2-Double");
     fprintf(out, "\n# Channel A Zone Select: 0-Zone1, 1-Zone2");
     fprintf(out, "\n# Channel A Zone Channel Select: 0-Chan1, 1-chan2");
     fprintf(out, "\n# Channel B Zone Select: 0-Zone1, 1-Zone2");
@@ -831,6 +838,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
     fprintf(out, "\n#");
     fprintf(out, "\nCh Name: %d",gs->ch_name);
+    fprintf(out, "\nDigital Monitor: %d",gs->digital_monitor);
     fprintf(out, "\nChannel A Zone Select: %d",gs->channel_a_zone_select);
     fprintf(out, "\nChannel A Zone Channel Select: %d",gs->channel_a_zone_channel_select);
     fprintf(out, "\nChannel B Zone Select: %d",gs->channel_b_zone_select);
@@ -1731,6 +1739,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Ch Name", param) == 0) {
         gs->ch_name = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Digital Monitor", param) == 0) {
+        gs->digital_monitor= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Channel A Zone Select", param) == 0) {
