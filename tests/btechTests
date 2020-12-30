@@ -24,7 +24,7 @@ cleanup() {
 
   for i in "${on_exit_items[@]}"
   do
-    echo "on_exit: $i"
+#    echo "on_exit: $i"
     eval $i
   done
 }
@@ -62,17 +62,21 @@ paramTest() {
   echo "Target byte address: $byteAddress"
 
   ./dmrconfig $beforeImg > $tmpConf
-  sed -r -i "s/^$paramName:.*/$paramName: 00/g" $tmpConf
+  egrep "^$paramName" $tmpConf
+  sed -r -i "s/^$paramName:.*/$paramName: 0/g" $tmpConf
+  egrep "^$paramName" $tmpConf
   ./dmrconfig -c $beforeImg $tmpConf
 
   local after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
   _testEq "00" == "$after" "$paramName" $byteAddress
 
-  sed -r -i "s/^$paramName:.*/$paramName: 01/g" $tmpConf
+  egrep "^$paramName" $tmpConf
+  sed -r -i "s/^$paramName:.*/$paramName: 1/g" $tmpConf
   egrep -i "^$paramName" $tmpConf
   ./dmrconfig -c $beforeImg $tmpConf
   after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
-  _testEq "01" == "$after" "$paramName"
+  [ "01" != "$after" ] && vim -d $beforeHex <(xxd device.img)
+  _testEq "01" == "$after" "$paramName" $byteAddress
 }
 
 touchTest() {
@@ -111,6 +115,10 @@ main() {
 
   paramTest "./tests/bt6x2/p1Long/off.hex" "./tests/bt6x2/p1Long/volt.hex" "P1 Long"
   paramTest "./tests/bt6x2/p2Long/off.hex" "./tests/bt6x2/p2Long/volt.hex" "P2 Long"
+
+  # Oooff multi errors of diffs
+  # paramTest "./tests/bt6x2/gps/off.hex" "./tests/bt6x2/gps/on.hex" "Gps"
+   paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units"
 
 }
 

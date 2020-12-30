@@ -255,6 +255,7 @@ typedef struct {
 //
 // General settings: 0x640 bytes at 0x02500000.
 //
+#pragma pack(push, 1) // exact fit - no padding
 typedef struct {
 
     // Bytes 0-5.
@@ -272,44 +273,45 @@ typedef struct {
     // Bytes 7-15
     uint8_t  _unused7[9];
 
-    // Byte 16-18
+    // Byte 16-18 0x10
     uint8_t  pf1_short; 
     uint8_t  pf2_short; 
     uint8_t  pf3_short; 
 
-    // Bytes 19-20
+    // Bytes 19-20 0x13
     uint8_t  p1_short; 
     uint8_t  p2_short; 
 
-    // Bytes 21-24 
+    // Bytes 19-23 
     uint8_t  _unused21[4];
 
-    // Bytes 25-26
+    // Bytes 24-25
     uint8_t  hold_time[2];
     
-    // Bytes 27-50
-    uint8_t  _unused27[22];
+    // Bytes 26-48
+    uint8_t  _unused26[22];
 
-    // Bytes 51
+    // Bytes 49 0x31 49
     uint8_t  talk_alert;
     uint8_t  pad[2];
 
     // Bytes 52-65
-    uint8_t  _unused52[13];
+    uint8_t  _unused52[13]; // 13
 
     // Bytes 66-68
     uint8_t  pf1_long;
     uint8_t  pf2_long;
     uint8_t  pf3_long;
 
-    // Bytes 69-70
+    // Bytes 69-70 //0x44
+    // 68
     uint8_t  p1_long;
     uint8_t  p2_long;
 
-    // Bytes 71-187
-    uint8_t  _unused67[116];
+    // Bytes 71-185
+    uint8_t  _unused71[116]; // 185 - 71
 
-    // Byte 188
+    // Byte 186
     uint8_t  gps_units;
 
     // Bytes 189-214
@@ -333,6 +335,7 @@ typedef struct {
     uint8_t _unused630[16];     // 0xff
 
 } general_settings_t;
+#pragma pack(pop) //back to whatever the previous packing mode was 
 
 //
 // Radio ID table: 250 entries, 0x1f40 bytes at 0x02580000.
