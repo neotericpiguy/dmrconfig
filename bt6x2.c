@@ -288,11 +288,14 @@ typedef struct {
     // Bytes 25-26
     uint8_t  digital_hold_time[2];
     
-    // Bytes 27-48 
-    uint8_t  _unused27[22];
+    // Bytes 27-47 
+    uint8_t  _unused27[21];
 
-    // Bytes 49 0x31 49
-    uint8_t  talk_alert;
+    // Bytes 48
+    uint8_t  timezone;
+
+    // Bytes 49 
+    uint8_t  talk_alert; // 0x31
     uint8_t  pad[2];
 
     // Bytes 52-62
@@ -792,6 +795,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n#");
     fprintf(out, "\nKey Beep: %d",gs->key_beep);
     fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
+    fprintf(out, "\nTimezone: %d",gs->timezone);
     fprintf(out, "\nGPS Units: %d",gs->gps_units);
     fprintf(out, "\nGet GPS Positioning: %d",gs->get_gps_positioning);
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
@@ -1632,6 +1636,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
         gs->talk_alert = strtoul(value, 0, 0);
         return;
     }
+    if (strcasecmp ("Timezone", param) == 0) {
+        gs->timezone= strtoul(value, 0, 0);
+        return;
+    }
     if (strcasecmp ("GPS Units", param) == 0) {
         gs->gps_units = strtoul(value, 0, 0);
         return;
@@ -1651,13 +1659,11 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     if (strcasecmp ("Digital Hold Time", param) == 0) {
         gs->digital_hold_time[0] = strtoul(value, 0, 0);
         gs->digital_hold_time[1] = gs->digital_hold_time[0];
-        printf("DHT: %d\n",gs->digital_hold_time[0]);
         return;
     }
     if (strcasecmp ("Digital Manual Hold Time", param) == 0) {
         gs->digital_manual_hold_time[0] = strtoul(value, 0, 0);
         gs->digital_manual_hold_time[1] = gs->digital_manual_hold_time[0];
-        printf("dmht: %d\n",gs->digital_manual_hold_time[0]);
         return;
     }
     if (strcasecmp ("Pf1 Short", param) == 0) {

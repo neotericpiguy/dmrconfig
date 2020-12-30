@@ -136,6 +136,7 @@ main() {
   # paramTest "./tests/bt6x2/gps/off.hex" "./tests/bt6x2/gps/on.hex" "Gps"
    paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units"
    paramTest "./tests/bt6x2/get_gps_positioning/off.hex" "./tests/bt6x2/get_gps_positioning/on.hex" "Get GPS Positioning"
+   paramTest "./tests/bt6x2/timezone/GMT8.hex" "./tests/bt6x2/timezone/GMT-7.hex" "Timezone"
 
    paramTest "./tests/bt6x2/analog_call_hold_time/10.hex" "./tests/bt6x2/analog_call_hold_time/2.hex" "Analog Call Hold Time"
    paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Hold Time" 2
