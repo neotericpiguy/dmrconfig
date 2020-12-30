@@ -295,11 +295,16 @@ typedef struct {
     uint8_t  timezone;
 
     // Bytes 49 
-    uint8_t  talk_alert; // 0x31
-    uint8_t  pad[2];
+    uint8_t  talk_permit; // 0x31
 
-    // Bytes 52-62
-    uint8_t  _unused52[11]; // 62-52 +1
+    // Bytes 50-53
+    uint8_t  _unused50[4];
+
+    // Bytes 54
+    uint8_t  idle_channel_tone; //0x36
+
+    // Bytes 55-62
+    uint8_t  _unused55[8];
 
     // Bytes 63
     uint8_t  get_gps_positioning; // 0x3f
@@ -784,21 +789,38 @@ static void print_intro(FILE *out, int verbose)
         fprintf(out, "-");
     }
     fprintf(out, "\n\n# General Settings");
-    fprintf(out, "\n# Talk Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
-    fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
+    fprintf(out, "\n# Talk Permit: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
+    fprintf(out, "\n# Idle Channel Tone: 0-Off, 1-On");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
     fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
     fprintf(out, "\n#");
-    fprintf(out, "\nKey Beep: %d",gs->key_beep);
-    fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
-    fprintf(out, "\nTimezone: %d",gs->timezone);
-    fprintf(out, "\nGPS Units: %d",gs->gps_units);
-    fprintf(out, "\nGet GPS Positioning: %d",gs->get_gps_positioning);
+    fprintf(out, "\nTalk Permit: %d",gs->talk_permit);
+    fprintf(out, "\nIdle Channel Tone: %d",gs->idle_channel_tone);
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
     fprintf(out, "\nCh Name: %d",gs->ch_name);
     fprintf(out, "\nDigital Hold Time: %d",gs->digital_hold_time[0]);
     fprintf(out, "\nDigital Manual Hold Time: %d",gs->digital_manual_hold_time[0]);
+
+    fprintf(out, "\n\n# GPS Settings");
+    fprintf(out, "\n# Timezone: 5-GMT-7, 20-GMT8");
+    fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
+    fprintf(out, "\n# Get GPS Position: 0-Off, 1-On");
+    fprintf(out, "\n#");
+    fprintf(out, "\nTimezone: %d",gs->timezone);
+    fprintf(out, "\nGPS Units: %d",gs->gps_units);
+    fprintf(out, "\nGet GPS Positioning: %d",gs->get_gps_positioning);
+
+    fprintf(out, "\n\n# Key Settings");
+    fprintf(out, "\n# Key Beep : 0-Off, 1-On");
+    fprintf(out, "\n# Pf1: 10-scan, 28-DigiMon");
+    fprintf(out, "\n# 0-off 1-volt 2-tx power 3-talkaround 4-reverse 5-encrypt 6-call 7-vox 8-vfo/mr 9-sub ptt");
+    fprintf(out, "\n# 10-scan 11-fm radio 12-alarm 13-record switch 14-record 15-messages 16-dial 17-gps info 18-monitor 19-main choose");
+    fprintf(out, "\n# 20-one touch 1 21-one touch 2 22-one touch 3 23-one touch 4 24-one touch 5 25-one touch 6 26-work alone 27-nuisance delete 28-digimonitor 29-sub ch switch");
+    fprintf(out, "\n# 30-prior zone 31-program scan 32-mic feature 33-lastcall reply 34-switch chtype 35-simp repeater 36-measurement 37-chan measure 38-max vol set 39-slot set");
+    fprintf(out, "\n# 40-ana sq set 41-roaming 42-zone sselect 43-romaing set 44-fixtiem mute 45-ctc/dcs set 46-aprs type 47-aprs set");
+    fprintf(out, "\n#");
+    fprintf(out, "\nKey Beep: %d",gs->key_beep);
     fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
     fprintf(out, "\nPf1 Long: %d",gs->pf1_long);
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
@@ -1629,8 +1651,12 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
         gs->key_beep= strtoul(value, 0, 0);
         return;
     }
-    if (strcasecmp ("Talk Alert", param) == 0) {
-        gs->talk_alert = strtoul(value, 0, 0);
+    if (strcasecmp ("Talk Permit", param) == 0) {
+        gs->talk_permit = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Idle Channel Tone", param) == 0) {
+        gs->idle_channel_tone= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Timezone", param) == 0) {
