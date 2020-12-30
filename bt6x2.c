@@ -286,7 +286,7 @@ typedef struct {
     uint8_t  _unused21[4]; 
 
     // Bytes 25-26
-    uint8_t  hold_time[2];
+    uint8_t  digital_hold_time[2];
     
     // Bytes 27-48 
     uint8_t  _unused27[22];
@@ -319,11 +319,12 @@ typedef struct {
     // Byte 186 0xba 
     uint8_t  gps_units;
 
-    // Bytes 189-214
+    // Bytes 187-213
+    uint8_t  _unused189[25]; // 716d0
     uint8_t  _unused189[25]; // 716d0
 
-    // Bytes 215
-    uint8_t  manual_hold_time[2];
+    // Bytes 214
+    uint8_t  digital_manual_hold_time[2]; // 0xd6
 
     // Bytes 216-1535
     uint8_t  _unused216[1320];
@@ -781,7 +782,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Talk Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
     fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
-    fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
+    fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
     fprintf(out, "\n#");
     fprintf(out, "\nKey Beep: %d",gs->key_beep);
@@ -789,8 +790,8 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nGPS Units: %d",gs->gps_units);
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
     fprintf(out, "\nCh Name: %d",gs->ch_name);
-    fprintf(out, "\nHold Time: %d",gs->hold_time[0]);
-    fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
+    fprintf(out, "\nDigital Hold Time: %d",gs->digital_hold_time[0]);
+    fprintf(out, "\nDigital Manual Hold Time: %d",gs->digital_manual_hold_time[0]);
     fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
     fprintf(out, "\nPf1 Long: %d",gs->pf1_long);
     fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
@@ -1637,14 +1638,16 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
         gs->ch_name = strtoul(value, 0, 0);
         return;
     }
-    if (strcasecmp ("Hold Time", param) == 0) {
-        gs->hold_time[0] = strtoul(value, 0, 0);
-        gs->hold_time[1] = gs->hold_time[0];
+    if (strcasecmp ("Digital Hold Time", param) == 0) {
+        gs->digital_hold_time[0] = strtoul(value, 0, 0);
+        gs->digital_hold_time[1] = gs->digital_hold_time[0];
+        printf("DHT: %d\n",gs->digital_hold_time[0]);
         return;
     }
-    if (strcasecmp ("Manual Hold Time", param) == 0) {
-        gs->manual_hold_time[0] = strtoul(value, 0, 0);
-        gs->manual_hold_time[1] = gs->manual_hold_time[0];
+    if (strcasecmp ("Digital Manual Hold Time", param) == 0) {
+        gs->digital_manual_hold_time[0] = strtoul(value, 0, 0);
+        gs->digital_manual_hold_time[1] = gs->digital_manual_hold_time[0];
+        printf("dmht: %d\n",gs->digital_manual_hold_time[0]);
         return;
     }
     if (strcasecmp ("Pf1 Short", param) == 0) {
