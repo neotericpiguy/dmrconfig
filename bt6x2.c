@@ -337,9 +337,6 @@ typedef struct {
     // Bytes 216-1535
     uint8_t  _unused216[1320];
 
-    // Random 2 bytes for alignment
-    uint8_t  _unused217[2];
-
     // Bytes 0x600-0x61f
     uint8_t intro_line1[16];    // Up to 14 characters
     uint8_t intro_line2[16];    // Up to 14 characters
