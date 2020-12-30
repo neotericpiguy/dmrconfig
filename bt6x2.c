@@ -354,20 +354,25 @@ typedef struct {
     // Bytes 187-213
     uint8_t  _unused189[27]; // 213-187 + 1
 
-    // Bytes 214
-    uint8_t  digital_manual_hold_time[2]; // 0xd6
+    // Bytes 214-215
+    uint8_t  digital_manual_hold_time[2]; // 0x6d6
 
-    // Bytes 216-1535
-    uint8_t  _unused216[1320];
+    // Bytes 216-451
+    uint8_t  _unused216[236]; 
 
-    // Bytes 0x600-0x61f
+    // Bytes 452
+    uint8_t channel_a_zone_channel_select;
+
+    // Bytes 453-1535
+    uint8_t  _unused229[1083]; 
+
+    // Bytes 0x600-0x61f 
     uint8_t intro_line1[16];    // Up to 14 characters
     uint8_t intro_line2[16];    // Up to 14 characters
 
     // Bytes 0x620-0x63f
     uint8_t password[16];       // Up to 8 ascii digits
     uint8_t _unused630[16];     // 0xff
-
 } general_settings_t;
 #pragma pack(pop) //back to whatever the previous packing mode was 
 
@@ -792,6 +797,9 @@ static void print_intro(FILE *out, int verbose)
 {
     general_settings_t *gs = GET_SETTINGS();
 
+    //1796
+    //1601
+//    fprintf(out,"Size of gs: %ld\n", sizeof (general_settings_t));
     if (verbose)
         fprintf(out, "\n# Text displayed when the radio powers up.\n");
     fprintf(out, "Intro Line 1: ");
@@ -809,6 +817,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n\n# General Settings");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
     fprintf(out, "\n# Channel A Zone Select: 0-Zone1, 1-Zone2");
+    fprintf(out, "\n# Channel A Zone Channel Select: 0-Chan1, 1-chan2");
     fprintf(out, "\n# Talk Permit: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
     fprintf(out, "\n# Idle Channel Tone: 0-Off, 1-On");
     fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
@@ -816,6 +825,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n#");
     fprintf(out, "\nCh Name: %d",gs->ch_name);
     fprintf(out, "\nChannel A Zone Select: %d",gs->channel_a_zone_select);
+    fprintf(out, "\nChannel A Zone Channel Select: %d",gs->channel_a_zone_channel_select);
     fprintf(out, "\nTalk Permit: %d",gs->talk_permit);
     fprintf(out, "\nIdle Channel Tone: %d",gs->idle_channel_tone);
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
@@ -1716,6 +1726,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Channel A Zone Select", param) == 0) {
         gs->channel_a_zone_select = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Channel A Zone Channel Select", param) == 0) {
+        gs->channel_a_zone_channel_select = strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Digital Hold Time", param) == 0) {

@@ -68,6 +68,7 @@ paramTest() {
   echo "Target byte Value: $byteAddressVal"
 
   ./dmrconfig $beforeImg > $tmpConf
+#  vi $tmpConf
   if ! egrep "^$paramName" $tmpConf ; then
     echo "Could not find $param"
     exit 1
@@ -115,6 +116,7 @@ main() {
 #  touchTest
 #  talkPermitTest
 
+  paramTest "./tests/bt6x2/currentChanA/76.hex" "./tests/bt6x2/currentChanA/218.hex" "Channel A Zone Channel Select"
   paramTest "./tests/bt6x2/currentChanA/scan1.hex" "./tests/bt6x2/currentChanA/tucson7.hex" "Channel A Zone Select"
 
   paramTest "./tests/bt6x2/current_contact_display/off.hex" "./tests/bt6x2/current_contact_display/on.hex" "Current Contact Display"
