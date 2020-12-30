@@ -826,6 +826,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Channel A Zone Select: 0-Zone1, 1-Zone2");
     fprintf(out, "\n# Channel A Zone Channel Select: 0-Chan1, 1-chan2");
     fprintf(out, "\n# Channel B Zone Select: 0-Zone1, 1-Zone2");
+    fprintf(out, "\n# Channel B Zone Channel Select: 0-Chan1, 1-chan2");
     fprintf(out, "\n# Talk Permit: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
     fprintf(out, "\n# Idle Channel Tone: 0-Off, 1-On");
     fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
