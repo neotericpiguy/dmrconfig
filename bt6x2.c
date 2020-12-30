@@ -255,7 +255,6 @@ typedef struct {
 //
 // General settings: 0x640 bytes at 0x02500000.
 //
-#pragma pack(push, 1) // exact fit - no padding
 typedef struct {
 
     // Bytes 0-5.
@@ -381,7 +380,6 @@ typedef struct {
     uint8_t password[16];       // Up to 8 ascii digits
     uint8_t _unused630[16];     // 0xff
 } general_settings_t;
-#pragma pack(pop) //back to whatever the previous packing mode was 
 
 //
 // Radio ID table: 250 entries, 0x1f40 bytes at 0x02580000.
