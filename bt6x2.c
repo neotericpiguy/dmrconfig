@@ -789,16 +789,16 @@ static void print_intro(FILE *out, int verbose)
         fprintf(out, "-");
     }
     fprintf(out, "\n\n# General Settings");
+    fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
     fprintf(out, "\n# Talk Permit: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
     fprintf(out, "\n# Idle Channel Tone: 0-Off, 1-On");
-    fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
     fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
     fprintf(out, "\n#");
+    fprintf(out, "\nCh Name: %d",gs->ch_name);
     fprintf(out, "\nTalk Permit: %d",gs->talk_permit);
     fprintf(out, "\nIdle Channel Tone: %d",gs->idle_channel_tone);
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
-    fprintf(out, "\nCh Name: %d",gs->ch_name);
     fprintf(out, "\nDigital Hold Time: %d",gs->digital_hold_time[0]);
     fprintf(out, "\nDigital Manual Hold Time: %d",gs->digital_manual_hold_time[0]);
 
