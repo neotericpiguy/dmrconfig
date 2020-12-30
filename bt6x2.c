@@ -330,14 +330,20 @@ typedef struct {
     // Bytes 70-79
     uint8_t  _unused70[10]; // 79-70 +1
 
-    // Bytes 80 0x50
-    uint8_t  analog_call_hold_time; 
+    // Bytes 80 
+    uint8_t  analog_call_hold_time; // 0x50
 
-    // Bytes 81-185
-    uint8_t  _unused81[105]; 
+    // Bytes 81-179
+    uint8_t  _unused81[99]; 
 
-    // Byte 186 0xba 
-    uint8_t  gps_units;
+    // Bytes 180
+    uint8_t  current_contact_display; // 0xb4
+
+    // Bytes 181-185
+    uint8_t  _unused181[5]; 
+
+    // Byte 186 
+    uint8_t  gps_units; // 0xba 
 
     // Bytes 187-213
     uint8_t  _unused189[27]; // 213-187 + 1
@@ -812,6 +818,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\n# Auto Backlight Duration: 1-5s, 2-10s");
     fprintf(out, "\n#");
     fprintf(out, "\nAuto Backlight Duration: %d",gs->auto_backlight_duration);
+    fprintf(out, "\nCurrent Contact Display: %d",gs->current_contact_display);
 
     fprintf(out, "\n\n# GPS Settings");
     fprintf(out, "\n# Timezone: 5-GMT-7, 20-GMT8");
@@ -1676,6 +1683,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Auto Backlight Duration", param) == 0) {
         gs->auto_backlight_duration= strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Current Contact Display", param) == 0) {
+        gs->current_contact_display= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("GPS Units", param) == 0) {
