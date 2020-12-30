@@ -274,22 +274,22 @@ typedef struct {
     uint8_t  _unused7[9];
 
     // Byte 16-18 0x10
-    uint8_t  pf1_short; 
-    uint8_t  pf2_short; 
-    uint8_t  pf3_short; 
+    uint8_t  pf1_short; // 0x10
+    uint8_t  pf2_short; // 0x11
+    uint8_t  pf3_short; // 0x12
 
     // Bytes 19-20 0x13
-    uint8_t  p1_short; 
-    uint8_t  p2_short; 
+    uint8_t  p1_short;  // 0x13
+    uint8_t  p2_short;  // 0x14
 
-    // Bytes 19-23 
-    uint8_t  _unused21[4];
+    // Bytes 21-24 
+    uint8_t  _unused21[4]; 
 
-    // Bytes 24-25
+    // Bytes 25-26
     uint8_t  hold_time[2];
     
-    // Bytes 26-48
-    uint8_t  _unused26[22];
+    // Bytes 27-48 
+    uint8_t  _unused27[22];
 
     // Bytes 49 0x31 49
     uint8_t  talk_alert;
@@ -303,16 +303,18 @@ typedef struct {
     uint8_t  pf2_long;
     uint8_t  pf3_long;
 
-    // Bytes 69-70 //0x44
-    // 68
-    uint8_t  p1_long;
-    uint8_t  p2_long;
+    // Bytes 68-69 
+    uint8_t  p1_long; // 0x44
+    uint8_t  p2_long; // 0x45
 
-    // Bytes 71-185
-    uint8_t  _unused71[116]; // 185 - 71
+    // Bytes 70-185
+    uint8_t  _unused70[116]; 
 
-    // Byte 186
+    // Bytes 80 0x50
+
+    // Byte 186 0xba 
     uint8_t  gps_units;
+
 
     // Bytes 189-214
     uint8_t  _unused189[25]; // 716d0

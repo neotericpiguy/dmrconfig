@@ -120,6 +120,7 @@ main() {
   # paramTest "./tests/bt6x2/gps/off.hex" "./tests/bt6x2/gps/on.hex" "Gps"
    paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units"
 
+   paramTest "./tests/bt6x2/analog_call_hold_time/10.hex" "./tests/bt6x2/analog_call_hold_time/2.hex" "Analog Call Hold Time"
 }
 
 main $@
