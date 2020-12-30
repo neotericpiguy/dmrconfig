@@ -269,51 +269,122 @@ typedef struct {
 #define PWON_CUST_CHAR  1       // Custom Char
 #define PWON_CUST_PICT  2       // Custom Picture
 
-    // Bytes 7
-    uint8_t  _unused7;
+    // Bytes 7-15
+    uint8_t  _unused7[9];
 
-    // Bytes 8-24
-#define HOLD_TIME_OFFSET (39-(2*16)+10)         //17
-    uint8_t  _unused8[HOLD_TIME_OFFSET];
+    // Byte 16-18 0x10
+    uint8_t  pf1_short; // 0x10
+    uint8_t  pf2_short; // 0x11
+    uint8_t  pf3_short; // 0x12
+
+    // Bytes 19-20 0x13
+    uint8_t  p1_short;  // 0x13
+    uint8_t  p2_short;  // 0x14
+    
+    // Bytes 21-24 
+    uint8_t  _unused21[4]; 
 
     // Bytes 25-26
-#define HOLD_TIME_SIZE 2
-    uint8_t  hold_time[HOLD_TIME_SIZE];
+    uint8_t  digital_hold_time[2];
     
-    // Bytes 27-50
-#define TALK_ALERT_OFFSET (41-HOLD_TIME_OFFSET-2) //24
-    uint8_t  _unused27[TALK_ALERT_OFFSET];
+    // Bytes 27-30 
+    uint8_t  _unused27[4];
 
-    // Bytes 51
-    uint8_t  talk_alert;
-    uint8_t  pad[2];
+    // Bytes 31-32
+    uint8_t  channel_a_zone_select;
+    uint8_t  channel_b_zone_select;
 
-    // Bytes 52-187
-#define GPS_UNITS_OFFSET (2+(8*16)+2+4)         //136
-    uint8_t  _unused52[GPS_UNITS_OFFSET];
+    // Bytes 33-38
+    uint8_t  _unused33[6];
 
-    // Byte 188
-    uint8_t  gps_units;
+    // Bytes 39
+    uint8_t  auto_backlight_duration; // 0x27
 
-    // Bytes 189-214
-#define MANUAL_HOLD_TIME_OFFSET (9+16)          //25
-    uint8_t  _unused189[MANUAL_HOLD_TIME_OFFSET]; // 716d0
+    // Bytes 40-47
+    uint8_t  _unused40[8];
 
-    // Bytes 215
-#define MANUAL_HOLD_TIME_SIZE                   2
-    uint8_t  manual_hold_time[MANUAL_HOLD_TIME_SIZE];
+    // Bytes 48
+    uint8_t  timezone; // 0x30
 
-    // Bytes 216-1535
-    uint8_t  _unused216[1320];
+    // Bytes 49 
+    uint8_t  talk_permit; // 0x31
 
-    // Bytes 0x600-0x61f
+    // Bytes 50-53
+    uint8_t  _unused50[4];
+
+    // Bytes 54
+    uint8_t  idle_channel_tone; //0x36
+
+    // Bytes 55-62
+    uint8_t  _unused55[8];
+
+    // Bytes 63
+    uint8_t  get_gps_positioning; // 0x3f
+
+    // Bytes 65
+    uint8_t  _unused64;
+
+    // Bytes 65-67
+    uint8_t  pf1_long; // 0x41
+    uint8_t  pf2_long; // 0x42
+    uint8_t  pf3_long; // 0x43
+
+    // Bytes 68-69 
+    uint8_t  p1_long; // 0x44
+    uint8_t  p2_long; // 0x45
+
+    // Bytes 70-72
+    uint8_t  _unused70[3];
+
+    // Bytes 73
+    uint8_t  digital_monitor;
+
+    // Bytes 74-79
+    uint8_t  _unused74[6]; 
+
+    // Bytes 80 
+    uint8_t  analog_call_hold_time; // 0x50
+
+    // Bytes 81-179
+    uint8_t  _unused81[99]; 
+
+    // Bytes 180
+    uint8_t  current_contact_display; // 0xb4
+
+    // Bytes 181-185
+    uint8_t  _unused181[5]; 
+
+    // Byte 186 
+    uint8_t  gps_units; // 0xba 
+
+    // Bytes 187-213
+    uint8_t  _unused189[27]; // 213-187 + 1
+
+    // Bytes 214-215
+    uint8_t  digital_manual_hold_time[2]; // 0x6d6
+
+    // Bytes 216-451
+    uint8_t  _unused216[236]; 
+
+    // Bytes 452
+    uint8_t channel_a_zone_channel_select;
+
+    // Bytes 453-963
+    uint8_t  _unused453[511]; 
+
+    // Bytes 964
+    uint8_t channel_b_zone_channel_select;
+
+    // Bytes 465-1535
+    uint8_t  _unused465[1071]; 
+
+    // Bytes 0x600-0x61f 
     uint8_t intro_line1[16];    // Up to 14 characters
     uint8_t intro_line2[16];    // Up to 14 characters
 
     // Bytes 0x620-0x63f
     uint8_t password[16];       // Up to 8 ascii digits
     uint8_t _unused630[16];     // 0xff
-
 } general_settings_t;
 
 //
@@ -737,6 +808,9 @@ static void print_intro(FILE *out, int verbose)
 {
     general_settings_t *gs = GET_SETTINGS();
 
+    //1796
+    //1601
+//    fprintf(out,"Size of gs: %ld\n", sizeof (general_settings_t));
     if (verbose)
         fprintf(out, "\n# Text displayed when the radio powers up.\n");
     fprintf(out, "Intro Line 1: ");
@@ -752,17 +826,65 @@ static void print_intro(FILE *out, int verbose)
         fprintf(out, "-");
     }
     fprintf(out, "\n\n# General Settings");
-    fprintf(out, "\n# Talk Alert: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
-    fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
     fprintf(out, "\n# Ch Name: 0-Name, 1-Frequency");
-    fprintf(out, "\n# Hold Time: 2-2s, 31-Unlimited");
+    fprintf(out, "\n# Digital Monitor: 0-Off, 2-Double");
+    fprintf(out, "\n# Channel A Zone Select: 0-Zone1, 1-Zone2");
+    fprintf(out, "\n# Channel A Zone Channel Select: 0-Chan1, 1-chan2");
+    fprintf(out, "\n# Channel B Zone Select: 0-Zone1, 1-Zone2");
+    fprintf(out, "\n# Channel B Zone Channel Select: 0-Chan1, 1-chan2");
+    fprintf(out, "\n# Talk Permit: 0-Off, 1-Digital, 2-Analog, 3-Digital+Analog");
+    fprintf(out, "\n# Idle Channel Tone: 0-Off, 1-On");
+    fprintf(out, "\n# Digital Hold Time: 2-2s, 31-Unlimited");
     fprintf(out, "\n# Manual Hold Time: 1-2s, 30-Unlimited");
-    fprintf(out, "\nKey Beep: %d",gs->key_beep);
-    fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
-    fprintf(out, "\nGPS Units: %d",gs->gps_units);
+    fprintf(out, "\n#");
     fprintf(out, "\nCh Name: %d",gs->ch_name);
-    fprintf(out, "\nHold Time: %d",gs->hold_time[0]);
-    fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
+    fprintf(out, "\nDigital Monitor: %d",gs->digital_monitor);
+    fprintf(out, "\nChannel A Zone Select: %d",gs->channel_a_zone_select);
+    fprintf(out, "\nChannel A Zone Channel Select: %d",gs->channel_a_zone_channel_select);
+    fprintf(out, "\nChannel B Zone Select: %d",gs->channel_b_zone_select);
+    fprintf(out, "\nChannel B Zone Channel Select: %d",gs->channel_b_zone_channel_select);
+    fprintf(out, "\nTalk Permit: %d",gs->talk_permit);
+    fprintf(out, "\nIdle Channel Tone: %d",gs->idle_channel_tone);
+    fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
+    fprintf(out, "\nDigital Hold Time: %d",gs->digital_hold_time[0]);
+    fprintf(out, "\nDigital Manual Hold Time: %d",gs->digital_manual_hold_time[0]);
+
+    fprintf(out, "\n\n# Display Settings");
+    fprintf(out, "\n# Auto Backlight Duration: 1-5s, 2-10s");
+    fprintf(out, "\n# Current Contact Display: 0-Off, 1-On");
+    fprintf(out, "\n#");
+    fprintf(out, "\nAuto Backlight Duration: %d",gs->auto_backlight_duration);
+    fprintf(out, "\nCurrent Contact Display: %d",gs->current_contact_display);
+
+    fprintf(out, "\n\n# GPS Settings");
+    fprintf(out, "\n# Timezone: 5-GMT-7, 20-GMT8");
+    fprintf(out, "\n# GPS Units: 0-Meters, 1-Feet");
+    fprintf(out, "\n# Get GPS Position: 0-Off, 1-On");
+    fprintf(out, "\n#");
+    fprintf(out, "\nTimezone: %d",gs->timezone);
+    fprintf(out, "\nGPS Units: %d",gs->gps_units);
+    fprintf(out, "\nGet GPS Positioning: %d",gs->get_gps_positioning);
+
+    fprintf(out, "\n\n# Key Settings");
+    fprintf(out, "\n# Key Beep : 0-Off, 1-On");
+    fprintf(out, "\n# Pf1: 10-scan, 28-DigiMon");
+    fprintf(out, "\n# 0-off 1-volt 2-tx power 3-talkaround 4-reverse 5-encrypt 6-call 7-vox 8-vfo/mr 9-sub ptt");
+    fprintf(out, "\n# 10-scan 11-fm radio 12-alarm 13-record switch 14-record 15-messages 16-dial 17-gps info 18-monitor 19-main choose");
+    fprintf(out, "\n# 20-one touch 1 21-one touch 2 22-one touch 3 23-one touch 4 24-one touch 5 25-one touch 6 26-work alone 27-nuisance delete 28-digimonitor 29-sub ch switch");
+    fprintf(out, "\n# 30-prior zone 31-program scan 32-mic feature 33-lastcall reply 34-switch chtype 35-simp repeater 36-measurement 37-chan measure 38-max vol set 39-slot set");
+    fprintf(out, "\n# 40-ana sq set 41-roaming 42-zone sselect 43-romaing set 44-fixtiem mute 45-ctc/dcs set 46-aprs type 47-aprs set");
+    fprintf(out, "\n#");
+    fprintf(out, "\nKey Beep: %d",gs->key_beep);
+    fprintf(out, "\nPf1 Short: %d",gs->pf1_short);
+    fprintf(out, "\nPf1 Long: %d",gs->pf1_long);
+    fprintf(out, "\nPf2 Short: %d",gs->pf2_short);
+    fprintf(out, "\nPf2 Long: %d",gs->pf2_long);
+    fprintf(out, "\nPf3 Short: %d",gs->pf3_short);
+    fprintf(out, "\nPf3 Long: %d",gs->pf3_long);
+    fprintf(out, "\nP1 Short: %d",gs->p1_short);
+    fprintf(out, "\nP1 Long: %d",gs->p1_long);
+    fprintf(out, "\nP2 Short: %d",gs->p2_short);
+    fprintf(out, "\nP2 Long: %d",gs->p2_long);
     fprintf(out, "\n");
 }
 
@@ -1583,26 +1705,110 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
         gs->key_beep= strtoul(value, 0, 0);
         return;
     }
-    if (strcasecmp ("Talk Alert", param) == 0) {
-        gs->talk_alert = strtoul(value, 0, 0);
+    if (strcasecmp ("Talk Permit", param) == 0) {
+        gs->talk_permit = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Idle Channel Tone", param) == 0) {
+        gs->idle_channel_tone= strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Timezone", param) == 0) {
+        gs->timezone= strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Auto Backlight Duration", param) == 0) {
+        gs->auto_backlight_duration= strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Current Contact Display", param) == 0) {
+        gs->current_contact_display= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("GPS Units", param) == 0) {
         gs->gps_units = strtoul(value, 0, 0);
         return;
     }
+    if (strcasecmp ("Get GPS Positioning", param) == 0) {
+        gs->get_gps_positioning= strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Analog Call Hold Time", param) == 0) {
+        gs->analog_call_hold_time= strtoul(value, 0, 0);
+        return;
+    }
     if (strcasecmp ("Ch Name", param) == 0) {
         gs->ch_name = strtoul(value, 0, 0);
         return;
     }
-    if (strcasecmp ("Hold Time", param) == 0) {
-        gs->hold_time[0] = strtoul(value, 0, 0);
-        gs->hold_time[1] = gs->hold_time[0];
+    if (strcasecmp ("Digital Monitor", param) == 0) {
+        gs->digital_monitor= strtoul(value, 0, 0);
         return;
     }
-    if (strcasecmp ("Manual Hold Time", param) == 0) {
-        gs->manual_hold_time[0] = strtoul(value, 0, 0);
-        gs->manual_hold_time[1] = gs->manual_hold_time[0];
+    if (strcasecmp ("Channel A Zone Select", param) == 0) {
+        gs->channel_a_zone_select = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Channel A Zone Channel Select", param) == 0) {
+        gs->channel_a_zone_channel_select = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Channel B Zone Select", param) == 0) {
+        gs->channel_b_zone_select = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Channel B Zone Channel Select", param) == 0) {
+        gs->channel_b_zone_channel_select = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Digital Hold Time", param) == 0) {
+        gs->digital_hold_time[0] = strtoul(value, 0, 0);
+        gs->digital_hold_time[1] = gs->digital_hold_time[0];
+        return;
+    }
+    if (strcasecmp ("Digital Manual Hold Time", param) == 0) {
+        gs->digital_manual_hold_time[0] = strtoul(value, 0, 0);
+        gs->digital_manual_hold_time[1] = gs->digital_manual_hold_time[0];
+        return;
+    }
+    if (strcasecmp ("Pf1 Short", param) == 0) {
+        gs->pf1_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf1 Long", param) == 0) {
+        gs->pf1_long = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf2 Short", param) == 0) {
+        gs->pf2_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf2 Long", param) == 0) {
+        gs->pf2_long = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf3 Short", param) == 0) {
+        gs->pf3_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Pf3 Long", param) == 0) {
+        gs->pf3_long = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("P1 Short", param) == 0) {
+        gs->p1_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("P1 Long", param) == 0) {
+        gs->p1_long = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("P2 Short", param) == 0) {
+        gs->p2_short = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("P2 Long", param) == 0) {
+        gs->p2_long = strtoul(value, 0, 0);
         return;
     }
     fprintf(stderr, "Bt Unknown parameter: %s = %s\n", param, value);
