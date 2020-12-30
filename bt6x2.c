@@ -320,8 +320,8 @@ typedef struct {
     uint8_t  gps_units;
 
     // Bytes 187-213
-    uint8_t  _unused189[25]; // 716d0
-    uint8_t  _unused189[25]; // 716d0
+//    uint8_t  _unused189[25]; // 716d0
+    uint8_t  _unused189[27]; // 716d0
 
     // Bytes 214
     uint8_t  digital_manual_hold_time[2]; // 0xd6
