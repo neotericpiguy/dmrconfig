@@ -60,10 +60,10 @@ paramTest() {
   xxd -r $beforeHex > $beforeImg
   xxd -r $afterHex > $afterImg
 
-#  diff  <(xxd -s 0x$baseAddress -l $size -c 1 $afterImg) <(xxd -s 0x$baseAddress -l $size -c 1 $beforeImg) | egrep ">" | tail -n $tailIndex | head -n1
+  diff  <(xxd -s 0x$baseAddress -l $size -c 1 $afterImg) <(xxd -s 0x$baseAddress -l $size -c 1 $beforeImg) | egrep ">" | tail -n $tailIndex | head -n1
   local byteAddress=`diff  <(xxd -s 0x$baseAddress -l $size -c 1 $afterImg) <(xxd -s 0x$baseAddress -l $size -c 1 $beforeImg) | egrep ">" |tail -n $tailIndex | head -n 1 | sed -r "s/> //g;s/:.*//g"`
   local byteAddressVal=`diff  <(xxd -s 0x$baseAddress -l $size -c 1 $afterImg) <(xxd -s 0x$baseAddress -l $size -c 1 $beforeImg) | egrep ">" | tail -n $tailIndex | head -n1 | awk '{print $3}'`
-  byteAddressVal=`printf %d $byteAddressVal`
+  byteAddressVal=`printf %d 0x$byteAddressVal`
   echo "Target byte address: $byteAddress"
   echo "Target byte Value: $byteAddressVal"
 
@@ -115,28 +115,28 @@ main() {
 #  touchTest
 #  talkPermitTest
 
-#  paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Alert"
-#  paramTest "./tests/bt6x2/keyBeep/on.hex"        "./tests/bt6x2/keyBeep/off.hex"    "Key Beep"
-#
-#  paramTest "./tests/bt6x2/pf1Short/volt.hex"    "./tests/bt6x2/pf1Short/scan.hex"    "Pf1 Short"
-#  paramTest "./tests/bt6x2/pf2Short/monitor.hex" "./tests/bt6x2/pf2Short/digiMon.hex" "Pf2 Short"
-#  paramTest "./tests/bt6x2/pf3Short/alarm.hex"   "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short"
-#
-#  paramTest "./tests/bt6x2/p1Short/mainChoose.hex" "./tests/bt6x2/p1Short/monitor.hex" "P1 Short"
-#  paramTest "./tests/bt6x2/p2Short/vfomr.hex"      "./tests/bt6x2/p2Short/monitor.hex" "P2 Short"
-#
-#  paramTest "./tests/bt6x2/pf1Long/off.hex" "./tests/bt6x2/pf1Long/volt.hex" "Pf1 Long"
-#  paramTest "./tests/bt6x2/pf2Long/off.hex" "./tests/bt6x2/pf2Long/volt.hex" "Pf2 Long"
-#  paramTest "./tests/bt6x2/pf3Long/off.hex" "./tests/bt6x2/pf3Long/volt.hex" "Pf3 Long"
-#
-#  paramTest "./tests/bt6x2/p1Long/off.hex" "./tests/bt6x2/p1Long/volt.hex" "P1 Long"
-#  paramTest "./tests/bt6x2/p2Long/off.hex" "./tests/bt6x2/p2Long/volt.hex" "P2 Long"
-#
-#  # Oooff multi errors of diffs
-#  # paramTest "./tests/bt6x2/gps/off.hex" "./tests/bt6x2/gps/on.hex" "Gps"
-#   paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units"
-#
-#   paramTest "./tests/bt6x2/analog_call_hold_time/10.hex" "./tests/bt6x2/analog_call_hold_time/2.hex" "Analog Call Hold Time"
+  paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Alert"
+  paramTest "./tests/bt6x2/keyBeep/on.hex"        "./tests/bt6x2/keyBeep/off.hex"    "Key Beep"
+
+  paramTest "./tests/bt6x2/pf1Short/volt.hex"    "./tests/bt6x2/pf1Short/scan.hex"    "Pf1 Short"
+  paramTest "./tests/bt6x2/pf2Short/monitor.hex" "./tests/bt6x2/pf2Short/digiMon.hex" "Pf2 Short"
+  paramTest "./tests/bt6x2/pf3Short/alarm.hex"   "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short"
+
+  paramTest "./tests/bt6x2/p1Short/mainChoose.hex" "./tests/bt6x2/p1Short/monitor.hex" "P1 Short"
+  paramTest "./tests/bt6x2/p2Short/vfomr.hex"      "./tests/bt6x2/p2Short/monitor.hex" "P2 Short"
+
+  paramTest "./tests/bt6x2/pf1Long/off.hex" "./tests/bt6x2/pf1Long/volt.hex" "Pf1 Long"
+  paramTest "./tests/bt6x2/pf2Long/off.hex" "./tests/bt6x2/pf2Long/volt.hex" "Pf2 Long"
+  paramTest "./tests/bt6x2/pf3Long/off.hex" "./tests/bt6x2/pf3Long/volt.hex" "Pf3 Long"
+
+  paramTest "./tests/bt6x2/p1Long/off.hex" "./tests/bt6x2/p1Long/volt.hex" "P1 Long"
+  paramTest "./tests/bt6x2/p2Long/off.hex" "./tests/bt6x2/p2Long/volt.hex" "P2 Long"
+
+  # Oooff multi errors of diffs
+  # paramTest "./tests/bt6x2/gps/off.hex" "./tests/bt6x2/gps/on.hex" "Gps"
+   paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units"
+
+   paramTest "./tests/bt6x2/analog_call_hold_time/10.hex" "./tests/bt6x2/analog_call_hold_time/2.hex" "Analog Call Hold Time"
    paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Hold Time" 2
    paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Manual Hold Time" 
 }
