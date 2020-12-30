@@ -115,6 +115,8 @@ main() {
 #  touchTest
 #  talkPermitTest
 
+  paramTest "./tests/bt6x2/auto_backlight_duration/5s.hex" "./tests/bt6x2/auto_backlight_duration/10s.hex" "Auto Backlight Duration"
+
   paramTest "./tests/bt6x2/idle_channel_tone/off.hex" "./tests/bt6x2/idle_channel_tone/on.hex" "Idle Channel Tone"
   paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Permit"
   paramTest "./tests/bt6x2/keyBeep/on.hex"        "./tests/bt6x2/keyBeep/off.hex"    "Key Beep"

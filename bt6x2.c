@@ -281,18 +281,24 @@ typedef struct {
     // Bytes 19-20 0x13
     uint8_t  p1_short;  // 0x13
     uint8_t  p2_short;  // 0x14
-
+    
     // Bytes 21-24 
     uint8_t  _unused21[4]; 
 
     // Bytes 25-26
     uint8_t  digital_hold_time[2];
     
-    // Bytes 27-47 
-    uint8_t  _unused27[21];
+    // Bytes 27-38 
+    uint8_t  _unused27[12];
+
+    // Bytes 39
+    uint8_t  auto_backlight_duration; // 0x27
+
+    // Bytes 40-47
+    uint8_t  _unused40[8];
 
     // Bytes 48
-    uint8_t  timezone;
+    uint8_t  timezone; // 0x30
 
     // Bytes 49 
     uint8_t  talk_permit; // 0x31
@@ -801,6 +807,11 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
     fprintf(out, "\nDigital Hold Time: %d",gs->digital_hold_time[0]);
     fprintf(out, "\nDigital Manual Hold Time: %d",gs->digital_manual_hold_time[0]);
+
+    fprintf(out, "\n\n# Display Settings");
+    fprintf(out, "\n# Auto Backlight Duration: 1-5s, 2-10s");
+    fprintf(out, "\n#");
+    fprintf(out, "\nAuto Backlight Duration: %d",gs->auto_backlight_duration);
 
     fprintf(out, "\n\n# GPS Settings");
     fprintf(out, "\n# Timezone: 5-GMT-7, 20-GMT8");
@@ -1661,6 +1672,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("Timezone", param) == 0) {
         gs->timezone= strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Auto Backlight Duration", param) == 0) {
+        gs->auto_backlight_duration= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("GPS Units", param) == 0) {
