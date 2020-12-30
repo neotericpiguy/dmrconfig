@@ -307,14 +307,17 @@ typedef struct {
     uint8_t  p1_long; // 0x44
     uint8_t  p2_long; // 0x45
 
-    // Bytes 70-185
-    uint8_t  _unused70[116]; 
+    // Bytes 70-79
+    uint8_t  _unused70[10]; // 79-70 +1
 
     // Bytes 80 0x50
+    uint8_t  analog_call_hold_time; 
+
+    // Bytes 81-185
+    uint8_t  _unused81[105]; 
 
     // Byte 186 0xba 
     uint8_t  gps_units;
-
 
     // Bytes 189-214
     uint8_t  _unused189[25]; // 716d0
@@ -784,6 +787,7 @@ static void print_intro(FILE *out, int verbose)
     fprintf(out, "\nKey Beep: %d",gs->key_beep);
     fprintf(out, "\nTalk Alert: %d",gs->talk_alert);
     fprintf(out, "\nGPS Units: %d",gs->gps_units);
+    fprintf(out, "\nAnalog Call Hold Time: %d",gs->analog_call_hold_time);
     fprintf(out, "\nCh Name: %d",gs->ch_name);
     fprintf(out, "\nHold Time: %d",gs->hold_time[0]);
     fprintf(out, "\nManual Hold Time: %d",gs->manual_hold_time[0]);
@@ -1623,6 +1627,10 @@ static void bt6x2_parse_parameter(radio_device_t *radio, char *param, char *valu
     }
     if (strcasecmp ("GPS Units", param) == 0) {
         gs->gps_units = strtoul(value, 0, 0);
+        return;
+    }
+    if (strcasecmp ("Analog Call Hold Time", param) == 0) {
+        gs->analog_call_hold_time= strtoul(value, 0, 0);
         return;
     }
     if (strcasecmp ("Ch Name", param) == 0) {
