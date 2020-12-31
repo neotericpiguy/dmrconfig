@@ -51,7 +51,7 @@ paramTest() {
   local tmpConf=`mktemp`
   local size=16
 
-  echo "Start $paramName"
+  echo "Start $paramName $beforeHex $afterHex"
   add_on_exit "{ rm -f $afterImg $beforeImg $tmpConf; }"
 
 #  local baseAddress=`diff $beforeHex $afterHex |  egrep ">" | tail -n 1 | sed -r "s/> //g;s/:.*//g"`
