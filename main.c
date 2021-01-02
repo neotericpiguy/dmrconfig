@@ -53,6 +53,9 @@ void usage()
     fprintf(stderr, "    dmrconfig -c file.img file.conf\n");
     fprintf(stderr, "                         Apply configuration script to the codeplug image.\n");
     fprintf(stderr, "                         Store modified copy to a file 'device.img'.\n");
+    fprintf(stderr, "    dmrconfig -c file.img file.conf modified.img\n");
+    fprintf(stderr, "                         Apply configuration script to the codeplug image.\n");
+    fprintf(stderr, "                         Store modified copy to a file 'device.img'.\n");
     fprintf(stderr, "    dmrconfig file.img\n");
     fprintf(stderr, "                         Display configuration from the codeplug image.\n");
     fprintf(stderr, "    dmrconfig -u [-t] file.csv\n");
@@ -116,10 +119,18 @@ int main(int argc, char **argv)
         radio_disconnect();
 
     } else if (config_flag) {
-        if (argc != 1 && argc != 2)
+        if (argc != 1 && argc != 2 && argc != 3)
             usage();
+        
+        if (argc == 3) {
+            // Apply text config to image file.
+            radio_read_image(argv[0]);
+            radio_print_version(stdout);
+            radio_parse_config(argv[1]);
+            radio_verify_config();
+            radio_save_image(argv[2]);
 
-        if (argc == 2) {
+        } else if (argc == 2) {
             // Apply text config to image file.
             radio_read_image(argv[0]);
             radio_print_version(stdout);

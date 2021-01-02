@@ -49,6 +49,7 @@ paramTest() {
   local afterImg=`mktemp`
   local beforeImg=`mktemp`
   local tmpConf=`mktemp`
+  local deviceImg=`mktemp`
   local size=16
 
   echo "Start $paramName $beforeHex $afterHex"
@@ -80,9 +81,9 @@ paramTest() {
 
   sed -r -i "s/^$paramName:.*/$paramName: 0/g" $tmpConf
   egrep "^$paramName" $tmpConf
-  ./dmrconfig -c $beforeImg $tmpConf
+  ./dmrconfig -c $beforeImg $tmpConf $deviceImg
 
-  local after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
+  local after="`xxd -s 0x$byteAddress -l 1 -c 1 $deviceImg | awk '{print $2}'`"
 #  [ "00" != "$after" ] && vi $tmpConf
 #  [ "00" != "$after" ] && vim -d $beforeHex <(xxd device.img)
   _testEq "00" == "$after" "$paramName" $byteAddress
@@ -90,8 +91,8 @@ paramTest() {
   egrep "^$paramName" $tmpConf
   sed -r -i "s/^$paramName:.*/$paramName: 1/g" $tmpConf
   egrep -i "^$paramName" $tmpConf
-  ./dmrconfig -c $beforeImg $tmpConf
-  after="`xxd -s 0x$byteAddress -l 1 -c 1 device.img | awk '{print $2}'`"
+  ./dmrconfig -c $beforeImg $tmpConf $deviceImg
+  after="`xxd -s 0x$byteAddress -l 1 -c 1 $deviceImg | awk '{print $2}'`"
 #  [ "01" != "$after" ] && vim -d $beforeHex <(xxd device.img)
   _testEq "01" == "$after" "$paramName" $byteAddress
 }
@@ -116,44 +117,50 @@ main() {
 #  touchTest
 #  talkPermitTest
 
-  paramTest "./tests/bt6x2/digital_monitor/off.hex" "./tests/bt6x2/digital_monitor/double.hex" "Digital Monitor"
+  paramTest "./tests/bt6x2/digital_monitor/off.hex" "./tests/bt6x2/digital_monitor/double.hex" "Digital Monitor" &
 
-  paramTest "./tests/bt6x2/currentChanA/scan1.hex" "./tests/bt6x2/currentChanA/tucson7.hex" "Channel A Zone Select"
-  paramTest "./tests/bt6x2/currentChanA/76.hex" "./tests/bt6x2/currentChanA/218.hex" "Channel A Zone Channel Select"
+  paramTest "./tests/bt6x2/currentChanA/scan1.hex" "./tests/bt6x2/currentChanA/tucson7.hex" "Channel A Zone Select" &
+  paramTest "./tests/bt6x2/currentChanA/76.hex" "./tests/bt6x2/currentChanA/218.hex" "Channel A Zone Channel Select" &
 
-  paramTest "./tests/bt6x2/currentChanB/scan1.hex" "./tests/bt6x2/currentChanB/favs76.hex" "Channel B Zone Select"
-  paramTest "./tests/bt6x2/currentChanB/76.hex" "./tests/bt6x2/currentChanB/138.hex" "Channel B Zone Channel Select"
+  paramTest "./tests/bt6x2/currentChanB/scan1.hex" "./tests/bt6x2/currentChanB/favs76.hex" "Channel B Zone Select" &
+  paramTest "./tests/bt6x2/currentChanB/76.hex" "./tests/bt6x2/currentChanB/138.hex" "Channel B Zone Channel Select"&
+  wait
 
-  paramTest "./tests/bt6x2/current_contact_display/off.hex" "./tests/bt6x2/current_contact_display/on.hex" "Current Contact Display"
-  paramTest "./tests/bt6x2/auto_backlight_duration/5s.hex" "./tests/bt6x2/auto_backlight_duration/10s.hex" "Auto Backlight Duration"
+  paramTest "./tests/bt6x2/current_contact_display/off.hex" "./tests/bt6x2/current_contact_display/on.hex" "Current Contact Display" &
+  paramTest "./tests/bt6x2/auto_backlight_duration/5s.hex" "./tests/bt6x2/auto_backlight_duration/10s.hex" "Auto Backlight Duration" &
 
-  paramTest "./tests/bt6x2/idle_channel_tone/off.hex" "./tests/bt6x2/idle_channel_tone/on.hex" "Idle Channel Tone"
-  paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Permit"
-  paramTest "./tests/bt6x2/keyBeep/on.hex"        "./tests/bt6x2/keyBeep/off.hex"    "Key Beep"
+  paramTest "./tests/bt6x2/idle_channel_tone/off.hex" "./tests/bt6x2/idle_channel_tone/on.hex" "Idle Channel Tone" &
+  paramTest "./tests/bt6x2/talkPermit/analog.hex" "./tests/bt6x2/talkPermit/off.hex" "Talk Permit" &
+  paramTest "./tests/bt6x2/keyBeep/on.hex"        "./tests/bt6x2/keyBeep/off.hex"    "Key Beep" &
+  wait
 
-  paramTest "./tests/bt6x2/pf1Short/volt.hex"    "./tests/bt6x2/pf1Short/scan.hex"    "Pf1 Short"
-  paramTest "./tests/bt6x2/pf2Short/monitor.hex" "./tests/bt6x2/pf2Short/digiMon.hex" "Pf2 Short"
-  paramTest "./tests/bt6x2/pf3Short/alarm.hex"   "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short"
+  paramTest "./tests/bt6x2/pf1Short/volt.hex"    "./tests/bt6x2/pf1Short/scan.hex"    "Pf1 Short" &
+  paramTest "./tests/bt6x2/pf2Short/monitor.hex" "./tests/bt6x2/pf2Short/digiMon.hex" "Pf2 Short" &
+  paramTest "./tests/bt6x2/pf3Short/alarm.hex"   "./tests/bt6x2/pf3Short/txPower.hex" "Pf3 Short" &
 
-  paramTest "./tests/bt6x2/p1Short/mainChoose.hex" "./tests/bt6x2/p1Short/monitor.hex" "P1 Short"
-  paramTest "./tests/bt6x2/p2Short/vfomr.hex"      "./tests/bt6x2/p2Short/monitor.hex" "P2 Short"
+  paramTest "./tests/bt6x2/p1Short/mainChoose.hex" "./tests/bt6x2/p1Short/monitor.hex" "P1 Short" &
+  paramTest "./tests/bt6x2/p2Short/vfomr.hex"      "./tests/bt6x2/p2Short/monitor.hex" "P2 Short" &
+  wait
 
-  paramTest "./tests/bt6x2/pf1Long/off.hex" "./tests/bt6x2/pf1Long/volt.hex" "Pf1 Long"
-  paramTest "./tests/bt6x2/pf2Long/off.hex" "./tests/bt6x2/pf2Long/volt.hex" "Pf2 Long"
-  paramTest "./tests/bt6x2/pf3Long/off.hex" "./tests/bt6x2/pf3Long/volt.hex" "Pf3 Long"
+  paramTest "./tests/bt6x2/pf1Long/off.hex" "./tests/bt6x2/pf1Long/volt.hex" "Pf1 Long" &
+  paramTest "./tests/bt6x2/pf2Long/off.hex" "./tests/bt6x2/pf2Long/volt.hex" "Pf2 Long" &
+  paramTest "./tests/bt6x2/pf3Long/off.hex" "./tests/bt6x2/pf3Long/volt.hex" "Pf3 Long" &
 
-  paramTest "./tests/bt6x2/p1Long/off.hex" "./tests/bt6x2/p1Long/volt.hex" "P1 Long"
-  paramTest "./tests/bt6x2/p2Long/off.hex" "./tests/bt6x2/p2Long/volt.hex" "P2 Long"
+  paramTest "./tests/bt6x2/p1Long/off.hex" "./tests/bt6x2/p1Long/volt.hex" "P1 Long" &
+  paramTest "./tests/bt6x2/p2Long/off.hex" "./tests/bt6x2/p2Long/volt.hex" "P2 Long" &
+  wait
 
   # Oooff multi errors of diffs
   # paramTest "./tests/bt6x2/gps/off.hex" "./tests/bt6x2/gps/on.hex" "Gps"
-   paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units"
-   paramTest "./tests/bt6x2/get_gps_positioning/off.hex" "./tests/bt6x2/get_gps_positioning/on.hex" "Get GPS Positioning"
-   paramTest "./tests/bt6x2/timezone/GMT8.hex" "./tests/bt6x2/timezone/GMT-7.hex" "Timezone"
+  paramTest "./tests/bt6x2/gps_units/feet.hex" "./tests/bt6x2/gps_units/meters.hex" "GPS Units" &
+  paramTest "./tests/bt6x2/get_gps_positioning/off.hex" "./tests/bt6x2/get_gps_positioning/on.hex" "Get GPS Positioning" &
+  paramTest "./tests/bt6x2/timezone/GMT8.hex" "./tests/bt6x2/timezone/GMT-7.hex" "Timezone" &
+  wait
 
-   paramTest "./tests/bt6x2/analog_call_hold_time/10.hex" "./tests/bt6x2/analog_call_hold_time/2.hex" "Analog Call Hold Time"
-   paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Hold Time" 2
-   paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Manual Hold Time" 
+  paramTest "./tests/bt6x2/analog_call_hold_time/10.hex" "./tests/bt6x2/analog_call_hold_time/2.hex" "Analog Call Hold Time" &
+  paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Hold Time" 2 &
+  paramTest "./tests/bt6x2/digit_call_hold_time/5.hex" "./tests/bt6x2/digit_call_hold_time/10.hex" "Digital Manual Hold Time"  &
+  wait
 }
 
 main $@
